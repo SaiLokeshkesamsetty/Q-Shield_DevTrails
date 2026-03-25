@@ -55,7 +55,7 @@ Q-Shield is a **Real-time income protection system** that:
 ## 📱 4. Product Experience & UI Screens
 *Designed for budget smartphones. Q-Shield is a lightweight Web PWA, bypassing app store friction and saving critical device storage for gig workers.*
 
-> 🎨 **UI Prototype (Figma)**: [View High-Fidelity Screens →](https://www.figma.com/your-link-here) *(Link to be updated before March 20, EOD)*
+> 🎨 **UI Prototype (Figma)**: [View High-Fidelity Screens →]([https://www.figma.com/your-link-here](https://www.figma.com/make/HoG8WAT4YlBdNFiZ3mrub3/Q-Commerce-Shield--Q-Shield-?t=L0yo7SJBb1ggV9qI-1)) 
 
 **Worker Web Portal (React.js)**
 - 🏠 **Worker Dashboard**: Clean interface accessible via mobile browser showing current location, local weather forecast, and "Earnings Protected Today" graphic.
