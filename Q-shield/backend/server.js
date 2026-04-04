@@ -23,25 +23,27 @@ app.get('/api/risk', async (req, res) => {
     res.json(riskData);
 });
 
-// 🚀 Production Static Serving
-if (process.env.NODE_ENV === 'production') {
+// 🚀 Production Static Serving (Disabled on Vercel, handled by edge rewrites)
+if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
     app.use(express.static(path.join(__dirname, '../frontend/dist')));
     app.get('*', (req, res) => {
         res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'));
     });
 }
 
-const PORT = process.env.PORT || 5000;
 
+// 🚀 Support for Vercel/Serverless
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        try {
+            require('./services/claimService');
+            triggerService.startMonitoring();
+        } catch (err) {
+            console.warn('triggerService not ready yet', err.message);
+        }
+    });
+}
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  
-  // Start the automated trigger engine & claim pipeline on boot up
-  try {
-     require('./services/claimService'); // Initialize listeners
-     triggerService.startMonitoring();
-  } catch (err) {
-      console.warn('triggerService not ready yet', err.message);
-  }
-});
+module.exports = app;

@@ -6,11 +6,26 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
+    '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1600,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('leaflet')) return 'map-vendor';
+            if (id.includes('chart.js')) return 'chart-vendor';
+            if (id.includes('lucide-react')) return 'icons';
+            return 'vendor';
+          }
+        }
+      }
+    }
+  }
 })

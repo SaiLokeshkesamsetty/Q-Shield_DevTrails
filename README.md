@@ -37,33 +37,61 @@ Parametric insurance is a revolutionary model where the payout is triggered by a
 
 ## 🖥️ Product Showcase (UI/UX)
 
-#### **1. The Digital Entry Point (Landing Page)**
-A high-impact, premium hero section that immediately communicates the value proposition: **AI-Powered Parametric Insurance**.
-> ![Landing Page](<img width="1808" height="876" alt="Screenshot 2026-04-04 192657" src="https://github.com/user-attachments/assets/d0dcd1b8-7ba1-45da-8647-4d5e9a18f9cc" />
-)
+---
 
-#### **2. Worker Dashboard (The Life-Saver)**
-A high-fidelity, glassmorphism-inspired interface showing live environmental risk, active coverage status, and a real-time automated claim pipeline.
-> ![Worker Dashboard](screenshots/worker_dashboard.png)
+### 1. 🚀 The Digital Entry Point (Landing Page)
+A high-impact, premium hero section that communicates:
+**AI-Powered Parametric Insurance**
 
-#### **3. Live Situational Radar**
-Real-time integration with RainViewer and TomTom APIs. Workers can see disruption "heatmaps" and gridlock zones in high-contrast detail.
-> ![Live Radar](screenshots/live_radar.png)
-
-
-#### **4. Admin Command Center**
-For insurers to monitor BCR (Benefit-Cost Ratio), loss ratios, and active claim velocity across the entire city.
-> ![Admin Dashboard](screenshots/admin_console.png)
-
-#### **5. Analytics & Operational Intelligence**
-Deep-dive into payout velocity trends and localized fraud identification.
-> ![Analytics Intelligence](screenshots/analytics_radar.png)
-
-#### **6. Worker Ecosystem Sync**
-Live monitoring of all registered partners and their status across various nexus zones.
-> ![Worker Sync](screenshots/worker_sync.png)
+![Landing Page](screenshots/landing.png)
 
 ---
+
+### 2. 🛡️ Worker Dashboard (The Life-Saver)
+A glassmorphism-powered dashboard showing:
+- Live risk telemetry  
+- Coverage status  
+- Automated claim pipeline  
+
+![Worker Dashboard](screenshots/worker_dashboard.png)
+
+---
+
+### 3. 🌍 Live Situational Radar
+Real-time disruption intelligence using:
+- RainViewer 🌧️  
+- TomTom Traffic 🚗  
+
+![Live Radar](screenshots/live_radar.png)
+
+---
+
+### 4. 🧠 Admin Command Center
+Monitor:
+- BCR (Benefit-Cost Ratio)  
+- Loss Ratio  
+- Claim velocity  
+
+![Admin Dashboard](screenshots/admin_console.png)
+
+---
+
+### 5. 📊 Analytics & Operational Intelligence
+Deep insights into:
+- Payout trends  
+- Fraud signals  
+
+![Analytics](screenshots/analytics.png)
+
+---
+
+### 6. 🔄 Worker Ecosystem Sync
+Live tracking of:
+- Registered workers  
+- Risk tiers  
+- Trust scores  
+
+![Worker Sync](screenshots/worker_sync.png)
 
 
 ## ⚡ Live Demo Flow (For Judges)
