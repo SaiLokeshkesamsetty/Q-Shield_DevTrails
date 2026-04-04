@@ -88,7 +88,7 @@ export default function WorkerDashboard({ user }) {
             const lat = workerProfile.latitude || workerProfile.last_location?.lat;
             const lng = workerProfile.longitude || workerProfile.last_location?.lng;
             
-            await api.simulateRainTrigger('RAIN', workerProfile.home_zone || 'Hyderabad', lat, lng, workerProfile.worker_id);
+            await api.simulateRainTrigger('RAIN', workerProfile.home_zone || 'Hyderabad', lat, lng, workerProfile.worker_id, workerProfile.mode);
             toast.success(`⚡ Signal Logged: Processing ${workerProfile.mode} Pipeline`, { id: toastId });
             setIsSimulating(true);
             

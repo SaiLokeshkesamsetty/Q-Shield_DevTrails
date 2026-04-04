@@ -186,7 +186,7 @@ class TriggerEngine extends EventEmitter {
         };
     }
 
-    async mockTriggerFire(type, zone = 'Hyderabad', lat = null, lng = null, targetWorkerId = null) {
+    async mockTriggerFire(type, zone = 'Hyderabad', lat = null, lng = null, targetWorkerId = null, requestedMode = null) {
         const tMap = {
             'RAIN': 'Extreme Weather (Rain)',
             'AQI': 'Air Quality Disruption',
@@ -195,8 +195,10 @@ class TriggerEngine extends EventEmitter {
         let eventType = tMap[type] || 'Extreme Weather (Rain)';
         console.log(`[Demo Control] Simulation request: ${eventType} for ${zone} at (${lat}, ${lng}), TargetWorker: ${targetWorkerId}`);
         
-        let mode = 'DEMO';
-        if (targetWorkerId) {
+        let mode = requestedMode || 'DEMO';
+        
+        // Only run slow DB lookup if the frontend explicitly failed to provide a targeted mode
+        if (!requestedMode && targetWorkerId) {
             try {
                 const { rows } = await pool.query('SELECT mode FROM workers WHERE worker_id = $1', [targetWorkerId]);
                 mode = rows[0]?.mode || 'DEMO';

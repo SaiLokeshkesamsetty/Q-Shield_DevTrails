@@ -5,14 +5,14 @@ const triggerEngine = require('../services/triggerService');
 
 // Demo Simulator Route
 router.post('/simulate-trigger', async (req, res) => {
-    const { triggerType, zone, lat, lng, workerId } = req.body; 
+    const { triggerType, zone, lat, lng, workerId, mode } = req.body; 
     
     if (!['RAIN', 'AQI', 'TRAFFIC'].includes(triggerType)) {
         return res.status(400).json({ error: 'Invalid trigger type' });
     }
 
     // 🚀 Instant Trigger (Targeted for Demo Reliability)
-    await triggerEngine.mockTriggerFire(triggerType, zone || 'Hyderabad', lat, lng, workerId);
+    await triggerEngine.mockTriggerFire(triggerType, zone || 'Hyderabad', lat, lng, workerId, mode);
 
     // ⏳ VERCEL SERVERLESS HACK: Keep the lambda alive for 2 seconds 
     // so the detached async claimService pipeline has time to finish database writes!

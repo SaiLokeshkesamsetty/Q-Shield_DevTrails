@@ -95,9 +95,9 @@ export const purchasePolicy = async (workerId, premiumAmount) => {
     mockState.isPolicyActive = true;
 };
 
-export const simulateRainTrigger = async (type = 'RAIN', zone, lat = null, lng = null, workerId = null) => {
+export const simulateRainTrigger = async (type = 'RAIN', zone, lat = null, lng = null, workerId = null, mode = 'LIVE') => {
     try {
-        await axios.post(`${API_BASE}/admin/simulate-trigger`, { triggerType: type, zone, lat, lng, workerId });
+        await axios.post(`${API_BASE}/admin/simulate-trigger`, { triggerType: type, zone, lat, lng, workerId, mode });
         return { success: true };
     } catch(e) {
         console.warn("Backend simulation error:", e.response?.data?.error || e.message);
