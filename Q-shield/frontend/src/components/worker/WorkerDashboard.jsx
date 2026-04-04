@@ -181,6 +181,7 @@ export default function WorkerDashboard({ user }) {
                                 intelligence={intelligence} 
                                 isSimulating={isSimulating}
                                 setIsSimulating={setIsSimulating}
+                                refresh={refresh}
                             />
                         </div>
                     )}

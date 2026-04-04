@@ -62,12 +62,6 @@ router.post('/auth', async (req, res) => {
             
             console.log(`[WorkerRoutes] New worker saved to Supabase: ${name}`);
             
-            // 🎁 DEMO PROMO: Auto-grant an active policy for 2026 hackathon sync
-            await pool.query(`
-                INSERT INTO policies (worker_id, premium_paid, status, start_date, end_date)
-                VALUES ($1, 50, 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30 days')
-            `, [newWorker.worker_id]);
-            
             workerRes = result;
         } else {
             // Login Check (Demo simple check)

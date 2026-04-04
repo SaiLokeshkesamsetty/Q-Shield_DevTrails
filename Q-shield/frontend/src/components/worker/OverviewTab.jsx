@@ -9,11 +9,23 @@ const PIPELINE_STEPS = [
     { id: 'Completed', label: 'Completed', icon: <CheckCircle2 className="w-4 h-4"/> }
 ];
 
-export default function OverviewTab({ user, data, intelligence, isSimulating, setIsSimulating }) {
+export default function OverviewTab({ user, data, intelligence, isSimulating, setIsSimulating, refresh }) {
     const latestClaim = data.claimsHistory && data.claimsHistory[0];
     const currentStepIndex = latestClaim ? PIPELINE_STEPS.findIndex(s => s.id === latestClaim.processing_step) : -1;
 
-    // Icon mapping for dynamic disruption display
+    const handlePurchase = async () => {
+        const toastId = toast.loading('Initiating Secure Transaction...');
+        try {
+            const api = await import('../../api');
+            await api.purchasePolicy(user.worker_id, data.currentPremiumQuote || 35);
+            toast.success('Coverage Active. Your income is now protected.', { id: toastId });
+            refresh();
+        } catch (e) {
+            toast.error('Transaction failed. Please try again.', { id: toastId });
+        }
+    };
+    
+    // ... icon logic ...
     const getRiskIcon = () => {
         const reason = (data.riskReason || '').toUpperCase();
         if (reason.includes('RAIN') || reason.includes('STORM') || reason.includes('PRECIPITATION')) return <CloudRain className={`w-5 h-5 ${intelligence.level === 'CRITICAL' ? 'text-red-500 animate-bounce' : 'text-slate-300'}`} />;
@@ -52,28 +64,61 @@ export default function OverviewTab({ user, data, intelligence, isSimulating, se
                 </div>
 
                 {/* Policy Details */}
-                <div className="bg-indigo-600 p-7 rounded-3xl text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group">
-                    <ShieldCheck className="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform duration-1000" />
-                    <div className="relative z-10">
-                        <h3 className="text-xs font-black text-indigo-100 uppercase tracking-widest mb-6">Parametric Cover</h3>
-                        <div className="text-3xl font-black font-outfit mb-1">PROTECTED</div>
-                        <p className="text-indigo-200 text-xs font-bold mb-6 italic opacity-80">Zero-touch payouts enabled for {user.home_zone}</p>
-                        <div className="bg-white/10 p-4 rounded-2xl border border-white/20 backdrop-blur-sm space-y-3">
-                            <div className="flex justify-between text-xs font-bold">
-                                <span className="opacity-70 italic tracking-tighter">Weekly Premium</span>
-                                <span>₹{data.currentPremiumQuote || 35}</span>
+                {data.activeCoverage ? (
+                    <div className="bg-indigo-600 p-7 rounded-3xl text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group border border-indigo-400/30">
+                        <ShieldCheck className="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform duration-1000" />
+                        <div className="relative z-10">
+                            <div className="flex justify-between items-center mb-6">
+                                 <h3 className="text-xs font-black text-indigo-100 uppercase tracking-widest ">Parametric Cover</h3>
+                                 <div className="flex items-center bg-white/10 px-2 py-1 rounded-full border border-white/20">
+                                    <div className="h-1.5 w-1.5 bg-emerald-400 rounded-full animate-pulse mr-2 shadow-[0_0_8px_#34d399]"></div>
+                                    <span className="text-[8px] font-black uppercase text-indigo-50">Active</span>
+                                 </div>
                             </div>
-                            <div className="h-[1px] bg-white/10 w-full opacity-30"></div>
-                            <div className="flex justify-between items-center text-xs font-bold">
-                                <div className="space-y-0.5">
-                                    <span className="opacity-70 block italic tracking-tighter">Est. Payout Range</span>
-                                    <span className="text-[8px] font-black uppercase tracking-widest text-indigo-200">Severity Dependent</span>
+                            <div className="text-3xl font-black font-outfit mb-1 tracking-tighter">PROTECTED</div>
+                            <p className="text-indigo-200 text-xs font-bold mb-6 italic opacity-80 leading-relaxed">Auto-payout protocol primed for {user.home_zone} disruption sensor hits.</p>
+                            <div className="bg-white/10 p-4 rounded-2xl border border-white/20 backdrop-blur-sm space-y-3">
+                                <div className="flex justify-between text-xs font-bold">
+                                    <span className="opacity-70 italic tracking-tighter">Weekly Premium</span>
+                                    <span>₹{data.activeCoverage.premium_paid || 35}</span>
                                 </div>
-                                <span className="text-sm font-black">₹180 – ₹500</span>
+                                <div className="h-[1px] bg-white/10 w-full opacity-30"></div>
+                                <div className="flex justify-between items-center text-xs font-bold">
+                                    <div className="space-y-0.5">
+                                        <span className="opacity-70 block italic tracking-tighter">Est. Recovery Payout</span>
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-indigo-200">Severity Dependent</span>
+                                    </div>
+                                    <span className="text-sm font-black">₹180 – ₹500</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="bg-rose-500 p-7 rounded-3xl text-white shadow-2xl shadow-rose-200 relative overflow-hidden group border border-rose-400/30">
+                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-rose-400/20 via-transparent to-transparent"></div>
+                         <ShieldAlert className="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform duration-1000" />
+                        
+                        <div className="relative z-10">
+                            <div className="flex justify-between items-center mb-6">
+                                 <h3 className="text-xs font-black text-rose-100 uppercase tracking-widest">Insurance Status</h3>
+                                 <div className="flex items-center bg-white/10 px-2 py-1 rounded-full border border-white/20">
+                                    <div className="h-1.5 w-1.5 bg-rose-200 rounded-full mr-2"></div>
+                                    <span className="text-[8px] font-black uppercase text-rose-50">Suspended</span>
+                                 </div>
+                            </div>
+                            <div className="text-3xl font-black font-outfit mb-1 tracking-tighter">UNPROTECTED</div>
+                            <p className="text-rose-100 text-[10px] font-bold mb-6 italic opacity-90 leading-normal">Wait! Disruption signals are {intelligence.level === 'CRITICAL' ? 'CRITICAL' : 'active'} in your zone. Your income is at risk.</p>
+                            
+                            <button 
+                                onClick={handlePurchase}
+                                className="w-full bg-white text-rose-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-rose-900/10 hover:bg-rose-50 active:scale-95 transition-all flex items-center justify-center group/purchase"
+                            >
+                                <CreditCard className="w-4 h-4 mr-3 group-hover/purchase:rotate-12 transition-transform" />
+                                BUY COVERAGE · ₹{data.currentPremiumQuote || 35}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* 🤖 Pipeline Visualization Column */}
