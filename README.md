@@ -37,19 +37,33 @@ Parametric insurance is a revolutionary model where the payout is triggered by a
 
 ## 🖥️ Product Showcase (UI/UX)
 
-#### **1. Worker Dashboard (The Life-Saver)**
-A high-fidelity, glassmorphism-inspired interface showing live environmental risk, active coverage status, and lifetime insurance earnings.
-> ![Worker Dashboard Placeholder](https://via.placeholder.com/800x450/1e1b4b/white?text=Worker+Dashboard+-+Premium+UI)
+#### **1. The Digital Entry Point (Landing Page)**
+A high-impact, premium hero section that immediately communicates the value proposition: **AI-Powered Parametric Insurance**.
+> ![Landing Page](screenshots/landing_page.png)
 
-#### **2. Live Situational Radar**
-Real-time integration with RainViewer and TomTom APIs. Workers can see disruption "heatmaps" and gridlock zones before they even start their shift.
-> ![Live Radar Placeholder](https://via.placeholder.com/800x450/0f172a/white?text=Real-time+Weather+and+Traffic+Radar)
+#### **2. Worker Dashboard (The Life-Saver)**
+A high-fidelity, glassmorphism-inspired interface showing live environmental risk, active coverage status, and a real-time automated claim pipeline.
+> ![Worker Dashboard](screenshots/worker_dashboard.png)
 
-#### **3. Admin Command Center**
+#### **3. Live Situational Radar**
+Real-time integration with RainViewer and TomTom APIs. Workers can see disruption "heatmaps" and gridlock zones in high-contrast detail.
+> ![Live Radar](screenshots/live_radar.png)
+
+
+#### **4. Admin Command Center**
 For insurers to monitor BCR (Benefit-Cost Ratio), loss ratios, and active claim velocity across the entire city.
-> ![Admin Dashboard Placeholder](https://via.placeholder.com/800x450/020617/white?text=Admin+Analytics+Command+Center)
+> ![Admin Dashboard](screenshots/admin_console.png)
+
+#### **5. Analytics & Operational Intelligence**
+Deep-dive into payout velocity trends and localized fraud identification.
+> ![Analytics Intelligence](screenshots/analytics_radar.png)
+
+#### **6. Worker Ecosystem Sync**
+Live monitoring of all registered partners and their status across various nexus zones.
+> ![Worker Sync](screenshots/worker_sync.png)
 
 ---
+
 
 ## ⚡ Live Demo Flow (For Judges)
 
