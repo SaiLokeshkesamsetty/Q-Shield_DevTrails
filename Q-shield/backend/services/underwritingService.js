@@ -10,9 +10,11 @@ const pool = require('../db');
  * @param {number} severity 
  * @param {string} severityString 
  * @param {string} mode 
+ * @param {object} liveParams
+ * @param {object} traffic
  * @returns {{isValid: boolean, reason?: string}}
  */
-function validateWeatherThreshold(eventType, severity, severityString, mode = 'LIVE') {
+function validateWeatherThreshold(eventType, severity, severityString, mode = 'LIVE', liveParams = null, traffic = null) {
     if (mode === 'DEMO') {
         return { isValid: true };
     }
@@ -24,7 +26,11 @@ function validateWeatherThreshold(eventType, severity, severityString, mode = 'L
     const eventTypeUpper = (eventType || '').toUpperCase();
 
     if (eventTypeUpper === 'MULTI_AUDIT_FAIL') {
-        return { isValid: false, reason: `Rain, Sun, Air, Traffic thresholds not met. Current conditions: ${severityString || 'Clear'}` };
+        let details = 'Clear';
+        if (liveParams && traffic) {
+            details = `Rain: ${liveParams.rain}mm, Air AQI: ${Math.round(liveParams.aqi)}, Temp: ${liveParams.temp}°C, Traffic Delay: ${100 - Math.round(traffic.speedRatio * 100)}%`;
+        }
+        return { isValid: false, reason: `Strict Audit: All metrics below payout limits. Measured [${details}].` };
     }
 
     if (eventTypeUpper.includes('RAIN')) {

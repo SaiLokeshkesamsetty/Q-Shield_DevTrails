@@ -126,7 +126,7 @@ class TriggerEngine extends EventEmitter {
         }, 30000); // Check every 30 seconds
     }
 
-    async fireTrigger(eventType, severity, zoneName, centerLoc, radiusKm = 5.0, severityNumeric = 0, durationHours = 1, isSimulation = false, targetWorkerId = null) {
+    async fireTrigger(eventType, severity, zoneName, centerLoc, radiusKm = 5.0, severityNumeric = 0, durationHours = 1, isSimulation = false, targetWorkerId = null, liveParams = null, traffic = null) {
         console.log(`\n🚨 [TriggerService] TRIGGER FIRED: ${eventType} in ${zoneName}! (Severity: ${severityNumeric}, Simulation: ${isSimulation}, Target: ${targetWorkerId || 'Global'})`);
         try {
             const query = `
@@ -156,7 +156,9 @@ class TriggerEngine extends EventEmitter {
                 durationHours,
                 isSimulation,
                 targetWorkerId,
-                severityString: severity
+                severityString: severity,
+                liveParams,
+                traffic
             });
 
         } catch (err) {
@@ -248,7 +250,7 @@ class TriggerEngine extends EventEmitter {
         }
 
         // 🚀 INSTANT TRIGGER: Drop the payload directly into the pipeline
-        await this.fireTrigger(eventType, severity, zone, { lat: triggerCenterLat, lng: triggerCenterLng }, 5.0, severityNumeric, durationHours, true, targetWorkerId);
+        await this.fireTrigger(eventType, severity, zone, { lat: triggerCenterLat, lng: triggerCenterLng }, 5.0, severityNumeric, durationHours, true, targetWorkerId, liveParams, traffic);
     }
 }
 

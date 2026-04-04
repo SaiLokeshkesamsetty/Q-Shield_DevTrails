@@ -97,7 +97,9 @@ async function processIndividualClaim(worker, trigger) {
             trigger.eventType,
             trigger.severityNumeric,
             trigger.severityString,
-            mode
+            mode,
+            trigger.liveParams,
+            trigger.traffic
         );
 
         if (!isThresholdValid) {
