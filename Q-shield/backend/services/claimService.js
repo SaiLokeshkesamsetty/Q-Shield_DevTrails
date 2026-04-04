@@ -184,7 +184,7 @@ async function rejectClaim(claimId, stage, reason) {
     console.log(`🚩 [LCP] Claim Rejected at ${stage}: ${reason}`);
     await pool.query(
         `UPDATE claims SET status = 'Rejected', failed_stage = $1, rejection_reason = $2, processing_step = $3 WHERE claim_id = $4`,
-        [stage, reason, stage + '_Failed', claimId]
+        [stage, reason, stage + '_Rejected', claimId]
     );
 }
 

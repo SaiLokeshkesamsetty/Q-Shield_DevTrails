@@ -160,7 +160,7 @@ export default function OverviewTab({ user, data, intelligence, isSimulating, se
                                         </div>
                                         <div className={`flex-1 ${realStatus === 'Rejected' && isCurrent ? 'bg-rose-50/50 border-rose-100' : 'bg-slate-50/50 border-slate-50'} p-4 rounded-2xl border flex justify-between items-center hover:bg-white hover:shadow-md transition-all duration-300`}>
                                             <div>
-                                                {latestClaim ? (
+                                                <div className="flex flex-col">
                                                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm border ${
                                                         isCompleted ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 
                                                         isCurrent && realStatus === 'Rejected' ? 'bg-rose-100 text-rose-700 border-rose-200' : 
@@ -171,9 +171,10 @@ export default function OverviewTab({ user, data, intelligence, isSimulating, se
                                                          (isCurrent && realStatus === 'Rejected') ? `REJECTED — ${latestClaim.failed_stage || 'AUDIT'}` :
                                                          (isCurrent) ? 'PROCESSING' : 'PENDING'}
                                                     </span>
-                                                ) : (
-                                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black text-slate-300 uppercase tracking-tighter">Monitoring</span>
-                                                )}
+                                                    {isCurrent && realStatus === 'Rejected' && (
+                                                        <span className="text-[10px] font-black text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full uppercase border border-rose-100 italic mt-1 text-center">Audit Failed</span>
+                                                    )}
+                                                </div>
                                                 <div className="text-[10px] font-bold text-slate-500 mt-0.5">
                                                     {isCurrent && realStatus === 'Rejected' ? (
                                                         <span className="text-rose-600 italic">"{latestClaim.rejection_reason}"</span>

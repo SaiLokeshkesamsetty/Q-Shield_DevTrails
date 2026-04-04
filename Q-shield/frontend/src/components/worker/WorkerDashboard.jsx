@@ -91,12 +91,12 @@ export default function WorkerDashboard({ user }) {
             const lng = workerProfile.longitude || workerProfile.last_location?.lng;
             
             await api.simulateRainTrigger('RAIN', workerProfile.home_zone || 'Hyderabad', lat, lng, workerProfile.worker_id);
-            toast.success(`⚡ Disruption signal logged. Processing ${workerProfile.mode} pipeline.`, { id: toastId });
+            toast.success(`⚡ Signal Logged: Processing ${workerProfile.mode} Pipeline`, { id: toastId });
             setIsSimulating(true);
             
-            setTimeout(() => {
-                refresh();
-            }, 2000);
+            // 🚀 Multi-stage pulse to capture the final audit state in history
+            setTimeout(refresh, 2500); 
+            setTimeout(refresh, 6000); 
         } catch(e) {
             toast.error('Simulation sync failed', { id: toastId });
         } finally {
