@@ -6,6 +6,9 @@ const triggerService = require('./services/triggerService');
 const path = require('path');
 const app = express();
 
+// Initialize internal listeners (critical for Serverless environments like Vercel)
+require('./services/claimService');
+
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -38,7 +41,6 @@ if (require.main === module) {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
         try {
-            require('./services/claimService');
             triggerService.startMonitoring();
         } catch (err) {
             console.warn('[Server] Automation engine not ready yet:', err.message);

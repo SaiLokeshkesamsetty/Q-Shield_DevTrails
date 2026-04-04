@@ -13,6 +13,11 @@ router.post('/simulate-trigger', async (req, res) => {
 
     // 🚀 Instant Trigger (Targeted for Demo Reliability)
     await triggerEngine.mockTriggerFire(triggerType, zone || 'Hyderabad', lat, lng, workerId);
+
+    // ⏳ VERCEL SERVERLESS HACK: Keep the lambda alive for 2 seconds 
+    // so the detached async claimService pipeline has time to finish database writes!
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     res.json({ success: true, message: `Disruption simulation for ${triggerType} triggered instantly for target: ${workerId || 'Global'}`});
 });
 
