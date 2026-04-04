@@ -112,7 +112,7 @@ export default function WorkerDashboard({ user }) {
             <div className="max-w-7xl mx-auto px-4 lg:px-8 space-y-8">
                 
                 {/* 🚀 Premium Orchestrator Header */}
-                <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] flex flex-col md:flex-row items-center justify-between gap-10 group relative overflow-hidden">
+                <div className="bg-slate-900/80 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] flex flex-col md:flex-row items-center justify-between gap-10 group relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-slate-900/0 to-purple-500/10 opacity-60"></div>
                     <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
                     

@@ -140,7 +140,7 @@ function LocationPickerModal({ isOpen, onClose, onSelect }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 animate-in fade-in duration-300">
             <div className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border border-white/20 animate-in zoom-in-95 duration-300">
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <div>
@@ -233,6 +233,7 @@ export default function AuthPage({ user, setUser }) {
       return toast.error('Email and Password are required');
     }
 
+    setIsMapOpen(false); // 🏗️ Safety: Force-close the map before auth starts
     setLoading(true);
     
     setTimeout(async () => {
@@ -287,7 +288,7 @@ export default function AuthPage({ user, setUser }) {
     <div className="min-h-[85vh] flex flex-col items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-500">
       
       <div className="w-full max-w-md relative">
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-400 rounded-3xl blur-3xl opacity-20 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-400 rounded-3xl blur-xl opacity-10 animate-pulse"></div>
           <div className="glass-card p-8 rounded-3xl relative overflow-hidden border border-white/60 shadow-[0_10px_40px_-10px_rgba(99,102,241,0.2)] bg-white/80">
               
               <div className="text-center mb-8">
