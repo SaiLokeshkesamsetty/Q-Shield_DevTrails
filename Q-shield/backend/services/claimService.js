@@ -22,8 +22,12 @@ triggerEngine.on('TRIGGER_FIRED', async (triggerData) => {
             console.log(`[ClaimService] 🎯 TARGETED INJECTION: Aiming trigger ${triggerData.triggerId} directly at Worker ${triggerData.targetWorkerId}`);
             
             // 🚀 SURGE ACTIVATION (Demo Resilience)
-            // We force the policy to 'Active' status if it's currently Pending, ensuring the demo works instantly.
-            await pool.query("UPDATE policies SET status = 'Active' WHERE worker_id = $1 AND status != 'Active'", [triggerData.targetWorkerId]);
+            // We force or create the policy record to ensure the simulation ALWAYS works for the demo.
+            await pool.query(`
+                INSERT INTO policies (worker_id, status, premium_paid, coverage_amount, start_date)
+                VALUES ($1, 'Active', 35, 500, NOW())
+                ON CONFLICT (worker_id) DO UPDATE SET status = 'Active'
+            `, [triggerData.targetWorkerId]);
 
             const directQuery = `
                 SELECT w.worker_id, w.upi_id, w.home_zone, w.mode, p.policy_id 

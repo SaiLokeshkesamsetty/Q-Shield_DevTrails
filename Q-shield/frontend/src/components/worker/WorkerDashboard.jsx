@@ -128,14 +128,14 @@ export default function WorkerDashboard({ user }) {
                                 Hi, {user?.name || user?.full_name || 'Worker'}
                             </h1>
                             <div className="flex items-center space-x-4">
-                                <div className="flex items-center bg-white/5 border border-white/10 px-4 py-2 rounded-2xl backdrop-blur-md">
+                                <div className="flex items-center bg-white/5 border border-white/10 px-4 py-2 rounded-2xl backdrop-blur-md hover:bg-white/10 transition-colors">
                                     <MapPin className="w-3.5 h-3.5 mr-2 text-indigo-400"/> 
-                                    <span className="text-slate-300 font-bold uppercase tracking-[0.2em] text-[10px]">{user.home_zone} Nexus</span>
+                                    <span className="text-slate-300 font-bold uppercase tracking-[0.2em] text-[10px]">{user?.home_zone || 'Nexus'} Zone</span>
                                 </div>
                                  <div className="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl">
-                                    <div className={`h-1.5 w-1.5 rounded-full ${workerProfile.mode === 'DEMO' ? 'bg-purple-500 animate-pulse shadow-[0_0_8px_#a855f7]' : 'bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]'}`}></div>
-                                    <span className={`${workerProfile.mode === 'DEMO' ? 'text-purple-400' : 'text-emerald-400'} font-black text-[10px] uppercase tracking-widest italic`}>
-                                        {workerProfile.mode === 'DEMO' ? '🧪 Demo Mode Ready' : '🟢 Live Mode'}
+                                    <div className={`h-1.5 w-1.5 rounded-full ${workerProfile?.mode === 'DEMO' ? 'bg-purple-500 animate-pulse shadow-[0_0_8px_#a855f7]' : 'bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]'}`}></div>
+                                    <span className={`${workerProfile?.mode === 'DEMO' ? 'text-purple-400' : 'text-emerald-400'} font-black text-[10px] uppercase tracking-widest italic`}>
+                                        {workerProfile?.mode === 'DEMO' ? '🧪 Demo Mode Ready' : '🟢 Live Mode'}
                                     </span>
                                 </div>
                             </div>

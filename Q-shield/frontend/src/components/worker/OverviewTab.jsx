@@ -65,7 +65,7 @@ export default function OverviewTab({ user, data, intelligence, isSimulating, se
                 </div>
 
                 {/* Policy Details */}
-                {data.activeCoverage ? (
+                {data?.activeCoverage ? (
                     <div className="bg-indigo-600 p-7 rounded-3xl text-white shadow-2xl shadow-indigo-200 relative overflow-hidden group border border-indigo-400/30">
                         <ShieldCheck className="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform duration-1000" />
                         <div className="relative z-10">
