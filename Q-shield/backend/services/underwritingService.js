@@ -13,7 +13,9 @@ const pool = require('../db');
  * @returns {{isValid: boolean, reason?: string}}
  */
 function validateWeatherThreshold(eventType, severity, severityString, mode = 'LIVE') {
-    // Removed Demo override so rigorous automated checks always apply
+    if (mode === 'DEMO') {
+        return { isValid: true };
+    }
 
     // ⚡ ENTERPRISE THRESHOLDS
     const RAIN_THRESHOLD = 50.0; // 50mm

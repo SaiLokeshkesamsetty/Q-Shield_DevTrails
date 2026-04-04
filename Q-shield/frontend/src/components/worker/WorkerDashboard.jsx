@@ -81,7 +81,7 @@ export default function WorkerDashboard({ user }) {
         // The simulation now always performs strict weather and fraud audits against real API endpoints.
 
         setTriggering(true);
-        const toastId = toast.loading('Initiating Strict Parametric Audit...');
+        const toastId = toast.loading(workerProfile.mode === 'DEMO' ? 'Executing Demo Payout Flow...' : 'Initiating Strict Parametric Audit...');
         try {
             const api = await import('../../api');
             const lat = workerProfile.latitude || workerProfile.last_location?.lat;
