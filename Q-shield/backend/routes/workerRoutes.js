@@ -30,7 +30,7 @@ const DEMO_ACCOUNTS = {
         is_verified: true
     },
     'demo@worker.com': {
-        worker_id: 'demo-worker-001',
+        worker_id: '11111111-1111-1111-1111-111111111111',
         name: 'Demo Worker',
         email: 'demo@worker.com',
         password: 'demo123',

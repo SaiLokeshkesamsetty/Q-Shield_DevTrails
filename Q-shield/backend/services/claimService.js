@@ -23,11 +23,13 @@ triggerEngine.on('TRIGGER_FIRED', async (triggerData) => {
             
             // 🚀 SURGE ACTIVATION (Demo Resilience)
             // We force or create the policy record to ensure the simulation ALWAYS works for the demo.
-            await pool.query(`
-                INSERT INTO policies (worker_id, status, premium_paid, coverage_amount, start_date)
-                VALUES ($1, 'Active', 35, 500, NOW())
-                ON CONFLICT (worker_id) DO UPDATE SET status = 'Active'
-            `, [triggerData.targetWorkerId]);
+            const existingPolicy = await pool.query('SELECT policy_id FROM policies WHERE worker_id = $1 AND status = \'Active\' LIMIT 1', [triggerData.targetWorkerId]);
+            if (existingPolicy.rows.length === 0) {
+                 await pool.query(`
+                     INSERT INTO policies (worker_id, status, premium_paid, start_date)
+                     VALUES ($1, 'Active', 35, NOW())
+                 `, [triggerData.targetWorkerId]);
+            }
 
             const directQuery = `
                 SELECT w.worker_id, w.upi_id, w.home_zone, w.mode, p.policy_id 
