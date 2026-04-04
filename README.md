@@ -41,7 +41,7 @@ Parametric insurance is a revolutionary model where the payout is triggered by a
 A high-impact, premium hero section that immediately communicates the value proposition: **AI-Powered Parametric Insurance**.
 > ![Landing Page](screenshots/landing_page.png)
 
-#### **2. Worker Dashboard (The Life-Saver)**
+#### **2. Worker Dashboard **
 A high-fidelity, glassmorphism-inspired interface showing live environmental risk, active coverage status, and a real-time automated claim pipeline.
 > ![Worker Dashboard](screenshots/worker_dashboard.png)
 
@@ -65,7 +65,7 @@ Live monitoring of all registered partners and their status across various nexus
 ---
 
 
-## ⚡ Live Demo Flow (For Judges)
+## ⚡ Live Demo Flow 
 
 Experience the full autonomous lifecycle in under 60 seconds:
 
@@ -80,7 +80,7 @@ Experience the full autonomous lifecycle in under 60 seconds:
 
 ---
 
-## 💎 Key Innovations (JUDGE FOCUS)
+## 💎 Key Innovations 
 
 - **🚀 Zero-Touch Claim Engine**: The industry's first completely autonomous settlement pipeline for micro-insurance.
 - **🛡️ GPS-Based Fraud Validation**: Uses the Haversine formula to ensure workers are physically present in the zones where disruptions occurred during the claim window.
@@ -142,4 +142,4 @@ Q-Shield is not just for delivery partners; it’s a blueprint for the future of
 At its core, **Q-Shield** is about human stability. It ensures that the people who power our modern commerce don't have to choose between their safety and their survival. **When the city stops, their income shouldn't.**
 
 ---
-**Designed with passion for the Guidewire DEVTrails 2026 Hackathon.**
+**Designed with passion.**
