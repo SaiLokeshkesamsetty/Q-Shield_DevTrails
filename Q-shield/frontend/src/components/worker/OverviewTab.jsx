@@ -41,25 +41,30 @@ export default function OverviewTab({ user, data, intelligence, isSimulating, se
             {/* 📊 Live Statistics Column */}
             <div className="space-y-6">
                 {/* Risk Meter */}
-                <div className={`bg-white p-7 rounded-3xl border shadow-sm transition-all duration-500 relative overflow-hidden group ${intelligence.level === 'CRITICAL' ? 'border-red-100 bg-red-50/30' : 'border-slate-50'}`}>
+                <div className={`bg-white p-7 rounded-3xl border shadow-sm transition-all duration-500 relative overflow-hidden group ${intelligence.level === 'CRITICAL' || isSimulating ? 'border-red-100 bg-red-50/30' : 'border-slate-50'}`}>
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Zone Telemetry</h3>
-                        {getRiskIcon()}
+                        <div className="flex flex-col">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Zone Telemetry</h3>
+                            {isSimulating && <span className="text-[8px] font-black text-indigo-500 uppercase tracking-tight animate-pulse">Running Simulation...</span>}
+                        </div>
+                        {isSimulating ? <Zap className="w-5 h-5 text-indigo-500 animate-bounce" /> : getRiskIcon()}
                     </div>
                     <div className="space-y-4">
                         <div className="flex justify-between items-end">
                             <div>
-                                <div className={`text-4xl font-black font-outfit ${intelligence.level === 'CRITICAL' ? 'text-rose-600' : 'text-slate-800'}`}>
-                                    {intelligence.level === 'CRITICAL' ? 'HIGH' : intelligence.level}
+                                <div className={`text-4xl font-black font-outfit ${(intelligence.level === 'CRITICAL' || isSimulating) ? 'text-rose-600' : 'text-slate-800'}`}>
+                                    {isSimulating ? 'HIGH' : (intelligence.level === 'CRITICAL' ? 'HIGH' : intelligence.level)}
                                 </div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">{data.riskReason || 'Optimal Conditions'}</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">
+                                    {isSimulating ? 'SIMULATED DISRUPTION' : (data?.riskReason || 'Optimal Conditions')}
+                                </p>
                             </div>
-                            <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${intelligence.level === 'CRITICAL' ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-500'}`}>
-                                {intelligence.level === 'CRITICAL' ? 'Disruption Active' : 'Stable'}
+                            <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${(intelligence.level === 'CRITICAL' || isSimulating) ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-500'}`}>
+                                {isSimulating ? 'Triggered' : (intelligence.level === 'CRITICAL' ? 'Disruption Active' : 'Stable')}
                             </span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full transition-all duration-1000" style={{ width: `${intelligence.score}%`, backgroundColor: intelligence.level === 'CRITICAL' ? '#f43f5e' : '#6366f1' }}></div>
+                            <div className="h-full transition-all duration-1000" style={{ width: isSimulating ? '95%' : `${intelligence.score}%`, backgroundColor: (intelligence.level === 'CRITICAL' || isSimulating) ? '#f43f5e' : '#6366f1' }}></div>
                         </div>
                     </div>
                 </div>
