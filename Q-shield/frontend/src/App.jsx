@@ -58,7 +58,7 @@ function Navigation({ user, setUser }) {
                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-600 transition-colors">System Live:</span>
                 <span className="text-xs font-black font-mono text-slate-700">
-                    {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    {currentTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) || '00:00:00'}
                 </span>
             </div>
 
@@ -72,7 +72,7 @@ function Navigation({ user, setUser }) {
                     </div>
                  ) : (
                    <>
-                      {user.role === 'admin' ? (
+                      {user?.role === 'admin' ? (
                           <NavLink to="/admin">Admin Dashboard</NavLink>
                       ) : (
                           <>
