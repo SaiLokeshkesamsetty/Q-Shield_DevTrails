@@ -209,42 +209,35 @@ class TriggerEngine extends EventEmitter {
         let triggerCenterLat = lat || 17.3850;
         let triggerCenterLng = lng || 78.4867;
 
-        if (mode === 'DEMO') {
-            console.log(`[Demo Control] 🧪 Demo Mode detected. Overriding with guaranteed success parameters.`);
-            severityNumeric = type === 'AQI' ? 380 : 75;
-            durationHours = type === 'AQI' ? 3 : 2;
-            severity = type === 'AQI' ? 'AQI Index 380 (Hazardous)' : 'Precipitation 75 mm/hr';
+        // 🔎 Parametric Rigor: Perform actual audit instead of forcing high values
+        console.log(`[Demo Control] 🔎 LIVE Audit: Pulling real telemetry for ${zone}.`);
+        const liveParams = await this.fetchLiveData(zone);
+        const traffic = await this.fetchTrafficData(liveParams?.lat || triggerCenterLat, liveParams?.lng || triggerCenterLng);
+
+        let metThreshold = null;
+
+        // Strict audit check against Enterprise Thresholds (standardized across platforms)
+        if (liveParams && liveParams.rain >= 50) {
+             metThreshold = { type: 'Extreme Weather (Rain)', num: liveParams.rain, text: `Real-World Precipitation ${liveParams.rain} mm/hr - ${liveParams.condition}` };
+        } else if (liveParams && liveParams.aqi >= 300) {
+             metThreshold = { type: 'Air Quality Disruption', num: liveParams.aqi, text: `Real-World AQI Index ${liveParams.aqi.toFixed(1)}` };
+        } else if (liveParams && liveParams.temp >= 42) {
+             metThreshold = { type: 'Extreme Heat', num: liveParams.temp, text: `Real-World Temperature ${liveParams.temp}°C` };
+        } else if (traffic && traffic.speedRatio < 0.4) {
+             metThreshold = { type: 'TRAFFIC_FLOW_DISRUPTION', num: Math.round(traffic.speedRatio * 100), text: `Real-World Traffic Congestion: ${Math.round(traffic.speedRatio * 100)}% Speed Efficiency` };
+        }
+
+        if (metThreshold) {
+            console.log(`✅ [Demo Control] Threshold met in real-time! Proceeding with Payout.`);
+            eventType = metThreshold.type;
+            severityNumeric = metThreshold.num;
+            severity = metThreshold.text;
+            if (liveParams?.lat) { triggerCenterLat = liveParams.lat; triggerCenterLng = liveParams.lng; }
         } else {
-            // 🔎 Parametric Rigor: Perform actual audit instead of forcing high values
-            console.log(`[Demo Control] 🔎 LIVE Audit: Pulling real telemetry for ${zone}.`);
-            const liveParams = await this.fetchLiveData(zone);
-            const traffic = await this.fetchTrafficData(liveParams?.lat || triggerCenterLat, liveParams?.lng || triggerCenterLng);
-
-            let metThreshold = null;
-
-            // Strict audit check against Enterprise Thresholds (standardized across platforms)
-            if (liveParams && liveParams.rain >= 50) {
-                 metThreshold = { type: 'Extreme Weather (Rain)', num: liveParams.rain, text: `Real-World Precipitation ${liveParams.rain} mm/hr - ${liveParams.condition}` };
-            } else if (liveParams && liveParams.aqi >= 300) {
-                 metThreshold = { type: 'Air Quality Disruption', num: liveParams.aqi, text: `Real-World AQI Index ${liveParams.aqi.toFixed(1)}` };
-            } else if (liveParams && liveParams.temp >= 42) {
-                 metThreshold = { type: 'Extreme Heat', num: liveParams.temp, text: `Real-World Temperature ${liveParams.temp}°C` };
-            } else if (traffic && traffic.speedRatio < 0.4) {
-                 metThreshold = { type: 'TRAFFIC_FLOW_DISRUPTION', num: Math.round(traffic.speedRatio * 100), text: `Real-World Traffic Congestion: ${Math.round(traffic.speedRatio * 100)}% Speed Efficiency` };
-            }
-
-            if (metThreshold) {
-                console.log(`✅ [Demo Control] Threshold met in real-time! Proceeding with Payout.`);
-                eventType = metThreshold.type;
-                severityNumeric = metThreshold.num;
-                severity = metThreshold.text;
-                if (liveParams?.lat) { triggerCenterLat = liveParams.lat; triggerCenterLng = liveParams.lng; }
-            } else {
-                console.log(`🚩 [Demo Control] Thresholds not met. System will REJECT the simulated claim.`);
-                eventType = 'MULTI_AUDIT_FAIL'; 
-                severityNumeric = 0;
-                severity = `Parametric Audit Failed. Current conditions: Rain:${liveParams?.rain||0}mm, AQI:${Math.round(liveParams?.aqi||0)}, TrfRatio:${traffic.speedRatio.toFixed(2)}`;
-            }
+            console.log(`🚩 [Demo Control] Thresholds not met. System will REJECT the simulated claim.`);
+            eventType = 'MULTI_AUDIT_FAIL'; 
+            severityNumeric = 0;
+            severity = `Parametric Audit Failed. Current conditions: Rain:${liveParams?.rain||0}mm, AQI:${Math.round(liveParams?.aqi||0)}, TrfRatio:${traffic.speedRatio.toFixed(2)}`;
         }
 
         // 🚀 INSTANT TRIGGER: Drop the payload directly into the pipeline

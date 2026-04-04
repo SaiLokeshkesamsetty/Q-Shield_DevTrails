@@ -78,13 +78,10 @@ export default function WorkerDashboard({ user }) {
     };
 
     const handleSimulateDisruption = async () => {
-        if (workerProfile.mode === 'LIVE') {
-            const confirm = window.confirm("⚠️ Live Mode Active: This simulation will perform strict weather and fraud audits. If real-world thresholds are not met, your claim will be REJECTED. \n\nTip: Click 'GO ONLINE' to prime a successful Demo Payout.");
-            if (!confirm) return;
-        }
+        // The simulation now always performs strict weather and fraud audits against real API endpoints.
 
         setTriggering(true);
-        const toastId = toast.loading(workerProfile.mode === 'DEMO' ? 'Executing Demo Payout Flow...' : 'Initiating Strict Parametric Audit...');
+        const toastId = toast.loading('Initiating Strict Parametric Audit...');
         try {
             const api = await import('../../api');
             const lat = workerProfile.latitude || workerProfile.last_location?.lat;
