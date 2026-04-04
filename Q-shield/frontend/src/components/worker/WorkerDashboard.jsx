@@ -55,18 +55,19 @@ export default function WorkerDashboard({ user }) {
     // 4. Intelligence Monitor: Alerts handled via UI cards instead of intrusive popups
     // (Removed auto-toast useEffect as per UI refinement request)
 
-    const handleCheckIn = async () => {
-        const toastId = toast.loading('Syncing GPS & Active Status...');
+    const handleModeToggle = async () => {
+        // Toggle between DEMO and LIVE
+        const newMode = workerProfile.mode === 'DEMO' ? 'LIVE' : 'DEMO';
+        const toastId = toast.loading(`Switching to ${newMode} Mode...`);
         try {
             const { updateWorkerStatus } = await import('../../api');
-            // 📍 Live Sync Priority: Registration Coords (workerProfile) -> Live GPS -> fallback
             const lat = workerProfile.latitude || workerProfile.last_location?.lat || 17.3850;
             const lng = workerProfile.longitude || workerProfile.last_location?.lng || 78.4867;
             
-            console.log(`📡 [Sync] Nexus handshaking at: ${lat}, ${lng}`);
-            const res = await updateWorkerStatus(workerProfile.worker_id, lat, lng);
+            console.log(`📡 [Sync] Toggling mode to ${newMode} at: ${lat}, ${lng}`);
+            const res = await updateWorkerStatus(workerProfile.worker_id, lat, lng, newMode);
             if (res.success && res.worker) {
-                toast.success('System Online. You are now eligible for payouts.', { id: toastId });
+                toast.success(`System Online: ${newMode} Mode Active`, { id: toastId });
                 setWorkerProfile(res.worker); // 🚀 Immediate UI Update
                 refresh();
             } else {
@@ -142,11 +143,15 @@ export default function WorkerDashboard({ user }) {
                     <div className="flex flex-col items-end gap-5 relative z-10">
                         <div className="flex space-x-4">
                             <button 
-                                onClick={handleCheckIn}
-                                className="bg-emerald-500 hover:bg-emerald-400 text-white px-8 py-5 rounded-2xl flex items-center font-black text-xs transition-all shadow-xl shadow-emerald-900/20 active:scale-95 uppercase tracking-widest group/btn"
+                                onClick={handleModeToggle}
+                                className={`text-white px-8 py-5 rounded-2xl flex items-center font-black text-xs transition-all shadow-xl active:scale-95 uppercase tracking-widest group/btn border
+                                    ${workerProfile.mode === 'DEMO' 
+                                        ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-900/20 border-purple-400' 
+                                        : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/20 border-emerald-400'}
+                                `}
                             >
                                 <ShieldCheck className="w-4 h-4 mr-3 group-hover/btn:rotate-12 transition-transform" />
-                                GO ONLINE
+                                {workerProfile.mode === 'DEMO' ? 'SWITCH TO LIVE' : 'SWITCH TO DEMO'}
                             </button>
                             <button 
                                 onClick={handleSimulateDisruption} 

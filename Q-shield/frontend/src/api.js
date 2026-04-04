@@ -132,9 +132,9 @@ export const fetchAdminAnalytics = async () => {
      }
 };
 
-export const updateWorkerStatus = async (workerId, latitude, longitude) => {
+export const updateWorkerStatus = async (workerId, latitude, longitude, mode = 'LIVE') => {
     try {
-        const res = await axios.patch(`${API_BASE}/workers/${workerId}/status`, { latitude, longitude });
+        const res = await axios.patch(`${API_BASE}/workers/${workerId}/status`, { latitude, longitude, mode });
         return { success: true, worker: res.data };
     } catch(e) {
         console.error("Status Update Failed:", e.message);

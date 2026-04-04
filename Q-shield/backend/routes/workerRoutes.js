@@ -186,17 +186,17 @@ router.get('/:id/dashboard', async (req, res) => {
     }
 });
 
-// Update Worker Status (Check-In)
+// Update Worker Status (Check-In & Mode Toggle)
 router.patch('/:id/status', async (req, res) => {
-    const { latitude, longitude } = req.body;
+    const { latitude, longitude, mode = 'LIVE' } = req.body;
     try {
         const query = `
             UPDATE workers 
-            SET last_location = $1, last_active_timestamp = CURRENT_TIMESTAMP, mode = 'DEMO'
+            SET last_location = $1, last_active_timestamp = CURRENT_TIMESTAMP, mode = $3
             WHERE worker_id = $2
             RETURNING *
         `;
-        const { rows } = await pool.query(query, [JSON.stringify({ lat: latitude, lng: longitude }), req.params.id]);
+        const { rows } = await pool.query(query, [JSON.stringify({ lat: latitude, lng: longitude }), req.params.id, mode]);
         if (rows.length === 0) return res.status(404).json({ error: 'Worker not found' });
         res.json(rows[0]);
     } catch (err) {
