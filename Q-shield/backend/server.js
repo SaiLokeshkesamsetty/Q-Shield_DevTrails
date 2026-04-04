@@ -32,17 +32,20 @@ if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
 }
 
 
-// 🚀 Support for Vercel/Serverless
+// 🚀 Boot Payout & Discovery Engines (Enforced for both Local & Production)
+try {
+    require('./services/claimService');
+    triggerService.startMonitoring();
+    console.log("🚦 [Server] Automation Engines (Claim/Trigger) Activated.");
+} catch (err) {
+    console.warn('[Server] Error booting background engines:', err.message);
+}
+
+// 🚀 Production Execution
 if (require.main === module) {
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
-        try {
-            require('./services/claimService');
-            triggerService.startMonitoring();
-        } catch (err) {
-            console.warn('triggerService not ready yet', err.message);
-        }
     });
 }
 

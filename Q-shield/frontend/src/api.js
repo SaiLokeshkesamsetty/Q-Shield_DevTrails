@@ -2,10 +2,8 @@ import axios from 'axios';
 
 const API_BASE = '/api';
 
-// Simple mock memory to support the frontend demo completely even if the backend is down
-let mockClaims = [
-  { claim_id: 'C_1', payout_amount: 250, claim_status: 'Paid', processing_step: 'Completed', created_at: new Date().toISOString() },
-];
+// Sync current environment state
+const isProd = window.location.hostname !== 'localhost';
 
 export const mockState = {
   isPolicyActive: false,
