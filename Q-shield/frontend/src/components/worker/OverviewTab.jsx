@@ -1,4 +1,5 @@
 import { CloudRain, ShieldCheck, Zap, BrainCircuit, CheckCircle2, DollarSign, Clock, Sun, Wind, Car, AlertTriangle, ShieldAlert } from 'lucide-react';
+import toast from 'react-hot-toast';
 import LiveClaimPipeline from './LiveClaimPipeline';
 
 const PIPELINE_STEPS = [
@@ -10,7 +11,7 @@ const PIPELINE_STEPS = [
 ];
 
 export default function OverviewTab({ user, data, intelligence, isSimulating, setIsSimulating, refresh }) {
-    const latestClaim = data.claimsHistory && data.claimsHistory[0];
+    const latestClaim = data?.claimsHistory && data?.claimsHistory[0];
     const currentStepIndex = latestClaim ? PIPELINE_STEPS.findIndex(s => s.id === latestClaim.processing_step) : -1;
 
     const handlePurchase = async () => {

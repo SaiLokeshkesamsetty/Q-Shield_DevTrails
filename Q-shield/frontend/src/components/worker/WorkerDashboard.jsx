@@ -125,7 +125,7 @@ export default function WorkerDashboard({ user }) {
                         </div>
                         <div>
                             <h1 className="text-5xl font-black text-white tracking-tighter font-outfit italic mb-3 drop-shadow-sm">
-                                Hi, {user.name}
+                                Hi, {user?.name || user?.full_name || 'Worker'}
                             </h1>
                             <div className="flex items-center space-x-4">
                                 <div className="flex items-center bg-white/5 border border-white/10 px-4 py-2 rounded-2xl backdrop-blur-md">

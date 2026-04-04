@@ -250,10 +250,10 @@ export default function AuthPage({ user, setUser }) {
             } else if(authMode === 'worker-login') {
                 const res = await loginWorker(formData.email, formData.password);
                 if(res.success) {
-                    const userData = { ...res.worker, role: 'worker' };
+                    const userData = { ...res.worker, name: res.worker.full_name || res.worker.name, role: 'worker' };
                     localStorage.setItem('qshield_user', JSON.stringify(userData));
                     setUser(userData);
-                    toast.success(`Welcome back, ${res.worker.name}!`);
+                    toast.success(`Welcome back, ${userData.name}!`);
                 } else toast.error('Invalid Email or Password. Please try again.');
                 
             } else if(authMode === 'worker-register') {
@@ -268,7 +268,7 @@ export default function AuthPage({ user, setUser }) {
                 });
                 
                 if(res.success) {
-                    const userData = { ...res.worker, role: 'worker' };
+                    const userData = { ...res.worker, name: res.worker.full_name || res.worker.name, role: 'worker' };
                     localStorage.setItem('qshield_user', JSON.stringify(userData));
                     setUser(userData);
                     toast.success('Registration successful!');
