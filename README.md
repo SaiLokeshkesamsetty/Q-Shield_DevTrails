@@ -39,7 +39,8 @@ Parametric insurance is a revolutionary model where the payout is triggered by a
 
 #### **1. The Digital Entry Point (Landing Page)**
 A high-impact, premium hero section that immediately communicates the value proposition: **AI-Powered Parametric Insurance**.
-> ![Landing Page](screenshots/landing_page.png)
+> ![Landing Page](<img width="1808" height="876" alt="Screenshot 2026-04-04 192657" src="https://github.com/user-attachments/assets/d0dcd1b8-7ba1-45da-8647-4d5e9a18f9cc" />
+)
 
 #### **2. Worker Dashboard **
 A high-fidelity, glassmorphism-inspired interface showing live environmental risk, active coverage status, and a real-time automated claim pipeline.
