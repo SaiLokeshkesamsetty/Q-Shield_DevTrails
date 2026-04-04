@@ -213,6 +213,9 @@ class TriggerEngine extends EventEmitter {
         let triggerCenterLat = lat || 17.3850;
         let triggerCenterLng = lng || 78.4867;
 
+        let liveParams = null;
+        let traffic = null;
+
         if (mode === 'DEMO') {
             console.log(`[Demo Control] 🧪 Demo Mode detected. Overriding with guaranteed success parameters.`);
             severityNumeric = type === 'AQI' ? 380 : 75;
@@ -221,8 +224,8 @@ class TriggerEngine extends EventEmitter {
         } else {
             // 🔎 Parametric Rigor: Perform actual audit instead of forcing high values
             console.log(`[Demo Control] 🔎 LIVE Audit: Pulling real telemetry for ${zone}.`);
-            const liveParams = await this.fetchLiveData(zone);
-            const traffic = await this.fetchTrafficData(liveParams?.lat || triggerCenterLat, liveParams?.lng || triggerCenterLng);
+            liveParams = await this.fetchLiveData(zone);
+            traffic = await this.fetchTrafficData(liveParams?.lat || triggerCenterLat, liveParams?.lng || triggerCenterLng);
 
             let metThreshold = null;
 
