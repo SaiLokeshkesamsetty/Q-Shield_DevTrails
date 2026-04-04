@@ -215,34 +215,35 @@ class TriggerEngine extends EventEmitter {
             durationHours = type === 'AQI' ? 3 : 2;
             severity = type === 'AQI' ? 'AQI Index 380 (Hazardous)' : 'Precipitation 75 mm/hr';
         } else {
-            // Multi-audit check
-            let metThreshold = null;
+            // 🔎 Parametric Rigor: Perform actual audit instead of forcing high values
+            console.log(`[Demo Control] 🔎 LIVE Audit: Pulling real telemetry for ${zone}.`);
             const liveParams = await this.fetchLiveData(zone);
             const traffic = await this.fetchTrafficData(liveParams?.lat || triggerCenterLat, liveParams?.lng || triggerCenterLng);
 
+            let metThreshold = null;
+
+            // Strict audit check against Enterprise Thresholds (standardized across platforms)
             if (liveParams && liveParams.rain >= 50) {
-                metThreshold = { type: 'RAIN', num: liveParams.rain, text: `Precipitation ${liveParams.rain} mm/hr - ${liveParams.condition}` };
+                 metThreshold = { type: 'Extreme Weather (Rain)', num: liveParams.rain, text: `Real-World Precipitation ${liveParams.rain} mm/hr - ${liveParams.condition}` };
             } else if (liveParams && liveParams.aqi >= 300) {
-                metThreshold = { type: 'AQI', num: liveParams.aqi, text: `AQI Index ${liveParams.aqi.toFixed(1)}` };
+                 metThreshold = { type: 'Air Quality Disruption', num: liveParams.aqi, text: `Real-World AQI Index ${liveParams.aqi.toFixed(1)}` };
             } else if (liveParams && liveParams.temp >= 42) {
-                metThreshold = { type: 'TEMP', num: liveParams.temp, text: `Temperature ${liveParams.temp}°C` };
+                 metThreshold = { type: 'Extreme Heat', num: liveParams.temp, text: `Real-World Temperature ${liveParams.temp}°C` };
             } else if (traffic && traffic.speedRatio < 0.4) {
-                metThreshold = { type: 'TRAFFIC', num: Math.round(traffic.speedRatio * 100), text: `Traffic Jam: ${Math.round(traffic.speedRatio * 100)}% Speed Efficiency` };
+                 metThreshold = { type: 'TRAFFIC_FLOW_DISRUPTION', num: Math.round(traffic.speedRatio * 100), text: `Real-World Traffic Congestion: ${Math.round(traffic.speedRatio * 100)}% Speed Efficiency` };
             }
 
             if (metThreshold) {
-                eventType = tMap[metThreshold.type] || 'Extreme Heat';
+                console.log(`✅ [Demo Control] Threshold met in real-time! Proceeding with Payout.`);
+                eventType = metThreshold.type;
                 severityNumeric = metThreshold.num;
                 severity = metThreshold.text;
+                if (liveParams?.lat) { triggerCenterLat = liveParams.lat; triggerCenterLng = liveParams.lng; }
             } else {
-                eventType = 'MULTI_AUDIT_FAIL';
+                console.log(`🚩 [Demo Control] Thresholds not met. System will REJECT the simulated claim.`);
+                eventType = 'MULTI_AUDIT_FAIL'; 
                 severityNumeric = 0;
-                severity = `Rain:${liveParams?.rain||0}mm Temp:${Math.round(liveParams?.temp||0)}C AQI:${Math.round(liveParams?.aqi||0)} Trf:${traffic.label}`;
-            }
-
-            if (liveParams && liveParams.lat) {
-                triggerCenterLat = liveParams.lat;
-                triggerCenterLng = liveParams.lng;
+                severity = `Parametric Audit Failed. Current conditions: Rain:${liveParams?.rain||0}mm, AQI:${Math.round(liveParams?.aqi||0)}, TrfRatio:${traffic.speedRatio.toFixed(2)}`;
             }
         }
 
