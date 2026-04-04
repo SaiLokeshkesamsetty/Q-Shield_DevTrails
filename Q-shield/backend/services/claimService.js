@@ -171,11 +171,8 @@ async function processIndividualClaim(worker, trigger) {
              await pool.query(`UPDATE claims SET status = 'Error', rejection_reason = 'System timeout or internal error' WHERE claim_id = $1`, [claimId]);
         }
     } finally {
-        // 🧪 AUTO-RESET: Return worker to LIVE mode after one simulation performance
-        if (mode === 'DEMO') {
-            console.log(`[LCP] 🧪 Resetting Worker ${worker.worker_id} to LIVE mode.`);
-            await pool.query("UPDATE workers SET mode = 'LIVE' WHERE worker_id = $1", [worker.worker_id]);
-        }
+        // 🧪 Demo Persistence:
+        // Worker mode is now persistent and will only change if the user manually updates their profile.
     }
 }
 
