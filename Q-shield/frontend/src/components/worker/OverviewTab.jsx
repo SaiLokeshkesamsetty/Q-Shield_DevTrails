@@ -1,4 +1,4 @@
-import { CloudRain, ShieldCheck, Zap, BrainCircuit, CheckCircle2, DollarSign, Clock, Sun, Wind, Car, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { CloudRain, ShieldCheck, Zap, BrainCircuit, CheckCircle2, DollarSign, Clock, Sun, Wind, Car, AlertTriangle, ShieldAlert, CreditCard } from 'lucide-react';
 import toast from 'react-hot-toast';
 import LiveClaimPipeline from './LiveClaimPipeline';
 
