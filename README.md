@@ -79,7 +79,7 @@ A simulation deck for administrators to test system resilience against scenarios
 
 ---
 
-## ⚡ Live Demo Flow (For Judges)
+## ⚡ Live Demo Flow 
 
 Experience the full autonomous lifecycle in under 60 seconds:
 
@@ -123,7 +123,7 @@ Launch the entire ecosystem (Frontend, Backend, and AI Engine) with one command:
 npm run dev
 ```
 - **Frontend port**: 5173
-- **Backend API port**: 5000              **Ensure the port is free. If occupied, update the port in the frontend configuration.**
+- **Backend API port**: 5000              **(Ensure the port is free. If occupied, update the port in the frontend configuration.)**
 - **AI Engine (Uvicorn) port**:8000
   
 
