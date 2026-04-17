@@ -105,7 +105,7 @@ npm run setup
 
 ### 2. Database Initialization
 1. Create a PostgreSQL database (or use a service like Supabase).
-2. Execute the schema script located at: **[backend/schema.sql](file:///c:/Users/kesam/.gemini/GuideWire/Q-shield/backend/schema.sql)**.
+2. Execute the schema script located at: **[backend/schema.sql]**.
 3. This will create the necessary `workers`, `policies`, `triggers`, and `claims` tables required for the AI engine to function.
 
 ### 3. Environment Configuration
