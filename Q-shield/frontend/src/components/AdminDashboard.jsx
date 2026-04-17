@@ -70,7 +70,16 @@ export default function AdminDashboard() {
       }
   };
 
-  if(!stats) return <div className="min-h-screen flex items-center justify-center text-indigo-500 font-bold animate-pulse"><Zap className="mr-2 animate-bounce"/> Initializing AI Core...</div>;
+  if(!stats) return (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-indigo-600">
+        <div className="relative mb-8">
+            <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
+            <Zap className="w-16 h-16 relative z-10 animate-bounce" />
+        </div>
+        <h2 className="text-xl font-black font-outfit uppercase tracking-widest">Synchronizing AI Core</h2>
+        <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest opacity-80">Fetching Neural Analytics & Risk Telemetry...</p>
+    </div>
+  );
 
   const chartData = {
     labels: ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM', 'NOW'],
@@ -113,7 +122,7 @@ export default function AdminDashboard() {
   };
 
   const renderMetric = (label, value, icon, color, subValue) => (
-    <div key={label} className={`bg-white/80 p-6 rounded-3xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(${color},0.15)] hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden backdrop-blur-xl`}>
+    <div key={label} className={`bg-white/90 p-6 rounded-3xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(${color},0.15)] hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden backdrop-blur-md`}>
       <div className={`absolute -right-4 -top-4 w-24 h-24 bg-${color.includes('99') ? 'indigo' : color.includes('168') ? 'purple' : 'emerald'}-50 rounded-full blur-2xl group-hover:bg-${color.includes('99') ? 'indigo' : color.includes('168') ? 'purple' : 'emerald'}-100 transition-colors`}></div>
       <div className="flex justify-between items-start mb-4 relative z-10">
         <div className={`bg-slate-50 p-3 rounded-2xl text-slate-600 group-hover:scale-110 transition-transform`}>{icon}</div>

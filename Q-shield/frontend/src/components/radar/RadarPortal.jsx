@@ -12,7 +12,7 @@ import { AlertCircle, RefreshCw } from 'lucide-react';
 // 📡 V4 Situational Components (Neutral Slate Header)
 const CommandHeader = ({ title, riskLevel }) => (
     <div className="absolute top-10 left-1/2 -translate-x-1/2 z-[1001] transition-all duration-1000 group">
-        <div className={`px-10 py-4 bg-slate-900/40 backdrop-blur-3xl rounded-[3rem] border border-white/10 shadow-[0_48px_96px_-24px_rgba(0,0,0,0.8)] flex items-center space-x-6 pointer-events-none ${riskLevel === 'CRITICAL' ? 'border-rose-500/20 shadow-[0_0_40px_rgba(244,63,94,0.1)]' : ''}`}>
+        <div className={`px-10 py-4 bg-slate-900/40 backdrop-blur-md rounded-[3rem] border border-white/10 shadow-[0_48px_96px_-24px_rgba(0,0,0,0.8)] flex items-center space-x-6 pointer-events-none ${riskLevel === 'CRITICAL' ? 'border-rose-500/20 shadow-[0_0_40px_rgba(244,63,94,0.1)]' : ''}`}>
             <div className={`h-2.5 w-2.5 rounded-full transition-all duration-1000 ${riskLevel === 'CRITICAL' ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500 shadow-[0_0_15px_#10b981]'}`}></div>
             <div className="flex flex-col">
                 <span className="text-xs font-black text-white/90 uppercase tracking-[0.5em] italic leading-tight group-hover:tracking-[0.6em] transition-all">{title}</span>
