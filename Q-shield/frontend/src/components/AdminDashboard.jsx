@@ -4,7 +4,8 @@ import {
     Activity, MapPin, Zap, TrendingUp, ShieldAlert, BrainCircuit, 
     CheckCircle2, AlertTriangle, AlertCircle, RefreshCw, BarChart3, 
     Clock, Loader2, ShieldCheck, Users, LayoutDashboard, 
-    History, BadgeInfo, Sparkles, User, Target, ArrowRight
+    History, BadgeInfo, Sparkles, User, Target, ArrowRight,
+    CloudRain, Wind
 } from 'lucide-react';
 const RadarPortal = React.lazy(() => import('./radar/RadarPortal'));
 import WorkerDetailsModal from './admin/WorkerDetailsModal';
