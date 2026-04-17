@@ -23,7 +23,6 @@ export default function ProfilePage({ user }) {
      try {
          const data = await fetchDashboard(user.worker_id);
          setDashboardData(data);
-         // Build the edit form from current data or defaults
          setEditForm({
             phone_number: data.worker.phone_number || '',
             bank_mask: data.worker.bank_details?.mask || 'XXXX1234',
@@ -37,60 +36,61 @@ export default function ProfilePage({ user }) {
      }
   };
 
-  const handleSaveProfile = async () => {
-     setSaving(true);
-     const tid = toast.loading('Securing identity vault...');
-     
-     // Mock payload based on our new DB schema
-     const updatePayload = {
-         phone_number: editForm.phone_number,
-         bank_details: { mask: editForm.bank_mask, bank: 'HDFC Bank', verified: true },
-         notification_preferences: { claim_alerts: editForm.claim_alerts, payout_notifications: true, risk_alerts: true }
-     };
+  if(!user || loading || !dashboardData) return <div className="p-20 text-center font-black animate-pulse text-indigo-500 uppercase tracking-[20px]">DECRYPTING_IDENTITY...</div>;
 
-     try {
-         const res = await updateWorkerProfile(user.worker_id, updatePayload);
-         if(res.success) {
-            toast.success('Identity Vault Updated', { id: tid });
-            setEditing(false);
-            await loadProfileData();
-         } else {
-            toast.error('Update Failed', { id: tid });
-         }
-     } catch(e) { toast.error('Connection Drop', { id: tid }); }
-     
-     setSaving(false);
+  const w = dashboardData.worker;
+  const isKycVerified = w.kyc_status === 'Verified';
+  const claims = dashboardData.claimsHistory || [];
+  const paidClaims = claims.filter(c => c.claim_status === 'Paid');
+  const totalEarnings = paidClaims.reduce((acc, c) => acc + parseFloat(c.amount || 0), 0);
+  const avgPayout = paidClaims.length ? Math.round(totalEarnings / paidClaims.length) : 0;
+  const activePolicy = dashboardData.activeCoverage;
+  const isCovered = activePolicy && activePolicy.status === 'Active';
+
+  const handleSaveProfile = async () => {
+      setSaving(true);
+      const tid = toast.loading('Securing identity vault...');
+      try {
+          const res = await updateWorkerProfile(user.worker_id, {
+              phone_number: editForm.phone_number,
+              bank_details: { mask: editForm.bank_mask, bank: 'HDFC Bank', verified: true },
+              notification_preferences: { claim_alerts: editForm.claim_alerts, payout_notifications: true, risk_alerts: true }
+          });
+          if(res.success) {
+             toast.success('Identity Vault Updated', { id: tid });
+             setEditing(false);
+             await loadProfileData();
+          } else {
+             toast.error('Update Failed', { id: tid });
+          }
+      } catch(e) { toast.error('Connection Drop', { id: tid }); }
+      setSaving(false);
   };
 
   const handleImageUpload = (e) => {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onloadend = async () => {
-          const base64String = reader.result;
           const tid = toast.loading('Uploading profile vault image...');
           try {
-              const res = await updateWorkerProfile(user.worker_id, { profile_image_url: base64String });
+              const res = await updateWorkerProfile(user.worker_id, { profile_image_url: reader.result });
               if (res.success) {
                   toast.success('Image securely vaulted', { id: tid });
                   await loadProfileData();
               } else {
                   toast.error('Upload failed', { id: tid });
               }
-          } catch(err) {
-              toast.error('Network Error', { id: tid });
-          }
+          } catch(err) { toast.error('Network Error', { id: tid }); }
       };
       reader.readAsDataURL(file);
+  };
+
   const handleVerifyPlatform = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-
       setVerifyingStep('UPLOADING');
       setIsVerifying(true);
-
-      // 🔄 Simulated Upload phase
       setTimeout(() => {
           setVerifyingStep('SCANNING');
           let progress = 0;
@@ -122,26 +122,10 @@ export default function ProfilePage({ user }) {
       }
   };
 
-
   const handleSimulateUpload = (docType) => {
       const tid = toast.loading(`Encrypting & uploading ${docType}...`);
       setTimeout(() => toast.success(`${docType} Verified using advanced OCR`, { id: tid }), 2000);
   };
-
-  if(!user || loading) return <div className="p-20 text-center font-black animate-pulse text-indigo-500 uppercase tracking-[20px]">DECRYPTING_IDENTITY...</div>;
-
-  const w = dashboardData.worker;
-  const isKycVerified = w.kyc_status === 'Verified';
-  
-  // Analytics Extracted Context
-  const claims = dashboardData.claimsHistory || [];
-  const paidClaims = claims.filter(c => c.claim_status === 'Paid');
-  const totalEarnings = paidClaims.reduce((acc, c) => acc + parseFloat(c.amount || 0), 0);
-  const avgPayout = paidClaims.length ? Math.round(totalEarnings / paidClaims.length) : 0;
-  
-  // Policy Context
-  const activePolicy = dashboardData.activeCoverage;
-  const isCovered = activePolicy && activePolicy.status === 'Active';
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-12 font-sans">
@@ -309,62 +293,60 @@ export default function ProfilePage({ user }) {
                      Compliance & Security <Lock className="w-4 h-4 text-slate-400"/>
                   </h2>
                   
-                      <div className="space-y-4">
-                           <div className={`p-5 rounded-2xl border-2 transition-all duration-500 ${w.is_gig_verified ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200 border-dashed'}`}>
-                               <div className="flex justify-between items-start mb-4">
-                                   <div>
-                                       <h3 className={`text-sm font-black uppercase tracking-widest ${w.is_gig_verified ? 'text-emerald-700' : 'text-slate-500'}`}>
-                                         {w.is_gig_verified ? 'Verified Platform Partner' : 'Gig Status: Unverified'}
-                                       </h3>
-                                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Proof of Platform (PoP)</p>
-                                   </div>
-                                   {w.is_gig_verified ? (
-                                       <div className="bg-emerald-500 p-1.5 rounded-full"><CheckCircle2 className="w-4 h-4 text-white" /></div>
-                                   ) : (
-                                       <AlertTriangle className="w-5 h-5 text-amber-500" />
-                                   )}
-                               </div>
+                  <div className="space-y-4">
+                      <div className={`p-5 rounded-2xl border-2 transition-all duration-500 ${w.is_gig_verified ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200 border-dashed'}`}>
+                          <div className="flex justify-between items-start mb-4">
+                              <div>
+                                  <h3 className={`text-sm font-black uppercase tracking-widest ${w.is_gig_verified ? 'text-emerald-700' : 'text-slate-500'}`}>
+                                    {w.is_gig_verified ? 'Verified Platform Partner' : 'Gig Status: Unverified'}
+                                  </h3>
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Proof of Platform (PoP)</p>
+                              </div>
+                              {w.is_gig_verified ? (
+                                  <div className="bg-emerald-500 p-1.5 rounded-full"><CheckCircle2 className="w-4 h-4 text-white" /></div>
+                              ) : (
+                                  <AlertTriangle className="w-5 h-5 text-amber-500" />
+                              )}
+                          </div>
                                
-                               {!w.is_gig_verified && (
-                                   <button 
-                                       onClick={() => verifyInputRef.current?.click()}
-                                       className="w-full py-3 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest text-slate-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-sm flex items-center justify-center group"
-                                   >
-                                       <Camera className="w-4 h-4 mr-2 group-hover:animate-bounce" /> Start AI Identity Scan
-                                   </button>
-                               )}
+                          {!w.is_gig_verified && (
+                              <button 
+                                  onClick={() => verifyInputRef.current?.click()}
+                                  className="w-full py-3 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest text-slate-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-sm flex items-center justify-center group"
+                              >
+                                  <Camera className="w-4 h-4 mr-2 group-hover:animate-bounce" /> Start AI Identity Scan
+                              </button>
+                          )}
                                
-                               <input type="file" ref={verifyInputRef} onChange={handleVerifyPlatform} className="hidden" accept="image/*" />
+                          <input type="file" ref={verifyInputRef} onChange={handleVerifyPlatform} className="hidden" accept="image/*" />
                                
-                               <p className="text-[10px] text-slate-400 mt-4 font-medium leading-relaxed italic">
-                                   *Upload a screenshot of your {w.platform} profile. Our engine uses OCR to verify active status.
-                               </p>
-                           </div>
-
-                           <button onClick={()=>handleSimulateUpload('Identity Proof')} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors group">
-                                <div className="flex items-center text-sm font-bold text-slate-600">
-                                    <UploadCloud className="w-5 h-5 mr-3 text-slate-300"/> Submit PAN/Aadhar
-                                </div>
-                                {isKycVerified && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-                           </button>
-                       </div>
-                      
-                      <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 mt-4">
-                           <div className="flex items-center">
-                               <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center mr-3"><Bell className="w-5 h-5 text-indigo-600"/></div>
-                               <div>
-                                   <div className="text-sm font-bold text-slate-800">Claim Alerts</div>
-                                   <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Push Notifications</div>
-                               </div>
-                           </div>
-                           <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                               <input type="checkbox" checked={editForm.claim_alerts} onChange={() => editing && setEditForm({...editForm, claim_alerts: !editForm.claim_alerts})} disabled={!editing} className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-slate-300 left-0 checked:right-0 checked:border-indigo-600 checked:bg-indigo-600 transition-all"/>
-                               <label className="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer"></label>
-                           </div>
+                          <p className="text-[10px] text-slate-400 mt-4 font-medium leading-relaxed italic">
+                              *Upload a screenshot of your {w.platform} profile. Our engine uses OCR to verify active status.
+                          </p>
                       </div>
+
+                      <button onClick={()=>handleSimulateUpload('Identity Proof')} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors group">
+                           <div className="flex items-center text-sm font-bold text-slate-600">
+                               <UploadCloud className="w-5 h-5 mr-3 text-slate-300"/> Submit PAN/Aadhar
+                           </div>
+                           {isKycVerified && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                      </button>
+                  </div>
+                      
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 mt-4">
+                       <div className="flex items-center">
+                           <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center mr-3"><Bell className="w-5 h-5 text-indigo-600"/></div>
+                           <div>
+                               <div className="text-sm font-bold text-slate-800">Claim Alerts</div>
+                               <div className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Push Notifications</div>
+                           </div>
+                       </div>
+                       <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                           <input type="checkbox" checked={editForm.claim_alerts} onChange={() => editing && setEditForm({...editForm, claim_alerts: !editForm.claim_alerts})} disabled={!editing} className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-slate-300 left-0 checked:right-0 checked:border-indigo-600 checked:bg-indigo-600 transition-all"/>
+                           <label className="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer"></label>
+                       </div>
                   </div>
               </div>
-
           </div>
 
           {/* 🌟 RIGHT COLUMN (Work Intel & Timeline) */}
@@ -373,7 +355,6 @@ export default function ProfilePage({ user }) {
               {/* 6. Work Intelligence Zone */}
               <div className="bg-slate-800 p-8 rounded-[2rem] border border-slate-700 shadow-xl relative overflow-hidden group">
                   <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/20 blur-3xl rounded-full"></div>
-                  
                   <h2 className="text-xs font-black uppercase tracking-widest text-indigo-300 mb-6">Work Intelligence</h2>
                   
                   <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-5 mb-6">
@@ -402,7 +383,6 @@ export default function ProfilePage({ user }) {
                   <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center justify-between">
                       System Timeline <History className="w-4 h-4 text-slate-400"/>
                   </h2>
-                  
                   <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                       <div className="relative border-l-2 border-indigo-100 ml-3 space-y-8 pb-4">
                           {claims.length > 0 ? claims.slice(0, 4).map((c, i) => (
@@ -424,26 +404,14 @@ export default function ProfilePage({ user }) {
                       </div>
                   </div>
               </div>
-
           </div>
-
       </div>
 
       {/* 🧬 AI VERIFICATION MODAL OVERLAY */}
       {isVerifying && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-xl p-4">
               <div className="max-w-md w-full bg-slate-900 border border-white/10 rounded-[2.5rem] p-10 relative overflow-hidden shadow-[0_0_50px_rgba(79,70,229,0.3)]">
-                  
-                  {/* Background Accents */}
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 animate-pulse"></div>
-                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none select-none text-[8px] font-mono leading-tight whitespace-pre">
-                      {`Q_SHIELD_V_SCAN_LOG: 0x82...
-SEARCHING_PIXELS_FOR_${w.platform.toUpperCase()}...
-OCR_BUFFER_INIT...
-EXTRACTING_WORKER_META...
-GEO_TAG_VALIDATION...`.repeat(20)}
-                  </div>
-
                   <div className="relative z-10 text-center">
                     {verifyingStep === 'UPLOADING' && (
                         <div className="space-y-6">
@@ -465,12 +433,9 @@ GEO_TAG_VALIDATION...`.repeat(20)}
                                      <span className="text-white font-mono font-black text-xl mt-2">{scanProgress}%</span>
                                  </div>
                              </div>
-                             
                              <div className="space-y-3">
                                 <h2 className="text-2xl font-black text-white uppercase tracking-tighter animate-pulse">Scanning Platform ID</h2>
-                                <div className="flex justify-center space-x-1">
-                                    <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded">DETECTING: {w.platform}</div>
-                                </div>
+                                <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded inline-block">DETECTING: {w.platform}</div>
                                 <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-4">
                                     <div className="h-full bg-indigo-500 transition-all duration-100" style={{width: `${scanProgress}%`}}></div>
                                 </div>
@@ -485,7 +450,6 @@ GEO_TAG_VALIDATION...`.repeat(20)}
                             </div>
                             <h2 className="text-4xl font-black text-white tracking-tight">VERIFIED</h2>
                             <p className="text-emerald-400 font-bold uppercase tracking-[0.2em] text-xs">Partner Authentication Confirmed</p>
-                            
                             <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mt-8">
                                 <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Assigned Trust ID</div>
                                 <div className="text-indigo-300 font-mono text-sm tracking-widest">Q-SHIELD-TR-9941X</div>
@@ -501,13 +465,8 @@ GEO_TAG_VALIDATION...`.repeat(20)}
           .custom-scrollbar::-webkit-scrollbar { width: 4px; }
           .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
           .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-          
           input[type=checkbox]:checked + label { background-color: #4f46e5; }
-
-          @keyframes scale-in {
-              0% { transform: scale(0.5); opacity: 0; }
-              100% { transform: scale(1); opacity: 1; }
-          }
+          @keyframes scale-in { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
           .animate-scale-in { animation: scale-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
       `}}/>
     </div>
