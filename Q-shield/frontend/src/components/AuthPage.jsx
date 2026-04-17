@@ -288,8 +288,7 @@ export default function AuthPage({ user, setUser }) {
     <div className="min-h-[85vh] flex flex-col items-center justify-center p-4 animate-in fade-in zoom-in-95 duration-500">
       
       <div className="w-full max-w-md relative">
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-purple-400 rounded-3xl blur-xl opacity-10 animate-pulse"></div>
-          <div className="glass-card p-8 rounded-3xl relative overflow-hidden border border-white/60 shadow-[0_10px_40px_-10px_rgba(99,102,241,0.2)] bg-white/80">
+          <div className="bg-white p-8 rounded-3xl relative overflow-hidden border border-gray-100 shadow-[0_20px_50px_rgba(99,102,241,0.1)]">
               
               <div className="text-center mb-8">
                   <ShieldCheck className="w-12 h-12 text-indigo-600 mx-auto mb-2" />
