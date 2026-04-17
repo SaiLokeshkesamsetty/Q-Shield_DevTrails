@@ -13,7 +13,7 @@
 
 ### [Recorded Video]
 **Watch the Q-Shield Platform in Action:**  
-[🎥 WATCH DEMO VIDEO](https://link-to-your-demo-video.com)
+[🎥 WATCH DEMO VIDEO](https://youtu.be/9mTU4L9e0M8?si=2ZVqHoemstSoGBDM)
 
 ---
 
