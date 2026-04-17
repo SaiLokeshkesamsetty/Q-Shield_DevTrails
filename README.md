@@ -85,7 +85,7 @@ Experience the full autonomous lifecycle in under 60 seconds:
 
 1.  **Login as Worker**: Use the available test credentials.
 2.  **Go Online**: This primes your GPS telemetry and sets the system to monitoring mode.
-3.  **Simulate Disruption**: Click the **"SIMULATE DISRUPTION"** button in the dashboard.
+3.  **Simulate Disruption**: Click the **"SIMULATE DISRUPTION"** button in the dashboard **(Added as Demo to show Workflow)**.
 4.  **Watch the Pipeline**: The UI will refresh instantly to show the live claim processing through **Threshold**, **Eligibility**, **Fraud Check**, and **Payout**.
 5.  **Verify History**: Go to the **History Tab** to see the transaction receipt and payout log.
 
