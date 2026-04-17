@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Q-Shield Parametric Insurance Platform - Guidewire DEVTrails 2026",
   "scripts": {
-    "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
-    "start": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" \"npm start --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev": "concurrently --names \"BACKEND,FRONTEND,AI_ENGINE\" --prefix-colors \"blue,green,magenta\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\" \"cd backend/ai_engine && python -m uvicorn app:app --host 0.0.0.0 --port 8000\"",
+    "start": "concurrently --names \"BACKEND,FRONTEND,AI_ENGINE\" --prefix-colors \"blue,green,magenta\" \"npm start --prefix backend\" \"npm run dev --prefix frontend\" \"cd backend/ai_engine && python -m uvicorn app:app --host 0.0.0.0 --port 8000\"",
     "build": "npm run build --prefix frontend && mkdir -p dist && cp -rv frontend/dist/* dist/",
-    "install:all": "npm install --prefix backend && npm install --prefix frontend"
+    "setup": "npm install && npm run install:all && echo. && echo 🚀 [Setup] Remember to run backend/schema.sql in your Postgres DB!",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend && pip install -r backend/ai_engine/requirements.txt"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
