@@ -1,70 +1,90 @@
-# Q-Shield Phase 3: AI-Driven Parametric Risk Engine
+# Q-Shield: The Resilience Core
+### AI-Driven Parametric Risk Engine for the Gig Economy
 
-Q-Shield has evolved from heuristic rules to a production-grade, AI-driven parametric insurance platform specifically engineered for gig delivery partners.
+**Q-Shield** is a production-grade, AI-driven parametric insurance platform specifically engineered for gig delivery partners (Blinkit, Swiggy, Zomato). By replacing manual claims with zero-touch, data-triggered micro-payouts, Q-Shield ensures that when the climate fails, the worker's income doesn't.
 
-![Q-Shield Ecosystem](https://img.shields.io/badge/Status-Phase_3_Active-success?style=for-the-badge&logo=appveyor)
+---
+
+## 📽️ Submission Deliverables
+
+### [Pitch Deck]
+> [!IMPORTANT]
+> **View our Vision for Gig Resilience here:**  
+> [👉 CLICK HERE TO VIEW PITCH DECK](https://link-to-your-pitch-deck.com) *(USER: Please update this link)*
+
+### [Recorded Video]
+> [!TIP]
+> **Watch the Q-Shield Platform in Action:**  
+> [🎥 WATCH DEMO VIDEO](https://link-to-your-demo-video.com) *(USER: Please update this link)*
+
+---
+
+## 🏗️ Elite Technical Architecture
+
+Q-Shield utilizes a decoupled microservices architecture designed for sub-50ms inference and zero-touch settlement.
+
+- **`backend/core/` (Node.js)**: High-throughput gateway managing event streams, policy state, and UPI settlement via Razorpay.
+- **`backend/ai_engine/` (Python/FastAPI)**: Dedicated ML inference service powering risk prediction and fraud detection.
+- **Parametric Pipeline**: Automated trigger engine that cross-references TomTom Traffic and OpenWeather APIs against worker GPS telemetry.
+
+### Logic Flow
+1. **Telemetry**: Real-time GPS and weather data stream into the AI core.
+2. **Inference**: Gradient Boosting Regressors calculate compound risk severity (Rain + Heat + Traffic).
+3. **Trigger**: If risk exceeds the parametric threshold, a payout is instantly authorized.
+4. **Settlement**: Zero-touch funds transfer pushed via UPI in <5 seconds.
+
+---
 
 ## 🧠 Truly AI-Driven Operations
-We completely replaced rule-based `if/else` checks with real-time ML predictors powered by Python and Scikit-Learn:
-* **Gradient Boosting Regressor**: Dynamically scores risk severity by recognizing the compounded danger of overlapping events (e.g., severe traffic gridlock *during* torrential rain).
-* **Random Forest Classifier**: Runs strict behavioral anomaly detection to catch velocity fraud (geo-hopping) and multi-claim abuse in real-time.
-* **Explainable AI (XAI) UI**: Our custom-built "Intelligence Breakdown" radar visualizes exactly how the models weight different environmental factors to determine premiums.
+
+Unlike traditional insurance, Q-Shield is powered by explainable actuarial models:
+*   **Gradient Boosting Regressor**: Identifies the compounded danger of overlapping events.
+*   **Random Forest Classifier**: Runs behavioral anomaly detection for fraud prevention.
+*   **Explainable AI (XAI)**: A custom UI radar that visualizes how rainfall, temperature, and historical frequency weighted the final risk score.
 
 ---
 
-## 🛰 Situational Awareness & Worker HUD
-We've moved beyond static dashboards by implementing a **Situational Telemetry HUD** for workers. This provides real-time, glassmorphic atmospheric data (AQI, Rain, Temp) directly in the mobile-responsive interface, turning an insurance tool into a vital safety cockpit.
+## 🛰️ Situational UI & Elite UX
+- **Mission-Critical HUD**: Workers receive a glassmorphic "Situational Awareness" HUD with real-time atmospheric telemetry.
+- **Simulation Command Deck**: Admins can trigger complex disaster scenarios (**Monsoon Crisis**, **Toxic Smog**, **Black Swan**) to test system resilience in real-time.
 
 ---
 
-## 🏗 Real-Time Microservices Architecture
-The monolith has been decoupled:
-- `backend/core/` **Node.js Gateway**: Handles Event streams (triggering, polling, idempotency) and UPI Settlement via Razorpay.
-- `backend/ai_engine/` **FastAPI (Python)**: Dedicated inference microservice (`/api/predict_risk`, `/api/predict_fraud`) for calculating actuarial multipliers with <50ms latency.
+## 🛠️ Local Installation & Setup
 
-### Flow Diagram
-```text
-[External Data] (Weather/Traffic) 
-       +                     
-[Mobile APP GPS] (Live Worker Geo) 
-       |                     
-       v                     
- [ API Gateway ] (Node/Express)
-       |                     
-       +--> [ Event Stream ] (Redis Pub/Sub or Kafka lite)
-                   |
-     +-------------+-------------+
-     |                           |
-[ AI Risk Engine ]      [ Fraud Detection Engine ]
-(Python + Scikit-Learn) (Behavioral/Geo Analytics)
-     |                           |
-     +-----> [ Decision & Scoring ] <-----+
-                   |
-        [ Claim Processing ] (Node.js)
-        (Calculates Dynamic Payouts)
-                   |
-        [ Settlement Gateway ] (Razorpay UPI)
+### Prerequisites
+- Node.js (v18+)
+- Python (3.9+)
+- PostgreSQL (or Supabase)
+
+### 1. Repository Setup
+```bash
+git clone https://github.com/SaiLokeshkesamsetty/Q-Shield_DevTrails.git
+cd Q-Shield_DevTrails
+npm run install:all
+```
+
+### 2. Environment Configuration
+Create a `.env` in the root:
+```env
+DATABASE_URL=your_db_url
+WEATHER_API_KEY=your_key
+JWT_SECRET=your_secret
+```
+
+### 3. Execution
+Run both servers simultaneously:
+```bash
+npm run dev
 ```
 
 ---
 
-## 🔍 Behavioral Analytics & Edge Cases
-- **Concurrent Disruptions**: The Risk Inference engine automatically scales up payouts natively via its ML training dataset when multiple disasters strike.
-- **Velocity Fraud Prevention**: Worker geo-traces and claims-per-week histories are analyzed. High-frequency claim loops are instantly identified by the ML network prior to settlement.
-- **Dynamic Pricing Model**: Risk models enable dynamic premiums based on historical behavior and risk zone frequency.
+## 🚀 Roadmap: Phase 4 & Beyond
+1. **Streaming Anomaly Detection**: Transitioning to Kafka/Flink for sliding-window location analysis.
+2. **Computer Vision Claim Adjunct**: Local ResNet verification of disaster-zone imagery.
+3. **Smart Contract Settlement**: Moving the parametric ledger to the Polygon blockchain using the AI Engine as an Oracle.
 
 ---
 
-## 🚀 Tech Stack
-- **Frontend**: React, TailwindCSS, Chart.js, Lucide Icons, Vite
-- **Core Backend**: Node.js, Express, PostgreSQL
-- **AI Microservice**: Python, FastAPI, Scikit-Learn, Pandas
-- **Integrations**: TomTom Traffic API, OpenWeatherAPI, Supabase Auth
-
----
-
-## 📅 Roadmap for Phase 4 (Future Improvements)
-To fully capture enterprise readiness for Phase 4 considerations:
-1. **Streaming Anomaly Detection (Kafka & Flink)**: Moving from REST API triggers to streaming data so location paths are analyzed via sliding time windows.
-2. **Computer Vision Claim Adjunct**: Allowing workers to attach pictures of disaster zones. A lightweight ResNet model can verify flooding parameters locally.
-3. **Smart Contract Automation**: Replace the internal ledger with an Ethereum or Polygon smart contract, where the AI Risk Engine acts as an Oracle.
+*Developed for the Guidewire DEVTrails Hackathon 2026.*
