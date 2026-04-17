@@ -21,11 +21,12 @@
 Q-Shield utilizes a decoupled microservices architecture designed for reliability and low-latency decision making.
 
 **System Flow:**
-`WeatherAPI` → `Node.js Gateway` → `Python ML Engine` → `Risk Analysis` → `Dynamic Premium/Payout` → `React HUD Component`
+`WeatherAPI` → `Node.js Gateway` → `Python ML Engine` → `Risk Analysis (Fraud Detection + Risk Scoring)` → `Dynamic Premium/Payout` → `React HUD`
 
 - **Core API Gateway (Node.js)**: Manages real-time event streams, policy state, and UPI settlement logic.
 - **AI Microservice (Python/FastAPI)**: A specialized inference engine that processes complex environmental vectors in sub-second timeframes.
-- **Parametric Execution**: An automated trigger system that cross-references TomTom Traffic and atmospheric sensors against worker GPS telemetry.
+- **Parametric Execution**: An automated trigger system that cross-references real-time environmental APIs with worker GPS telemetry to trigger payouts instantly without manual claims.
+- ⚡ **Real-time decision pipeline with sub-second latency**
 
 ---
 
@@ -33,6 +34,7 @@ Q-Shield utilizes a decoupled microservices architecture designed for reliabilit
 Q-Shield integrates a proactive risk pricing system that moves beyond reactive coverage.
 
 *   **7-Day Climatic Integration**: Real-time ingestion from WeatherAPI to project impending disruptions at the zone level.
+*   **AI Suggested Premium Output**: Generates dynamic pricing recommendations (e.g., ₹42 based on projected risk levels)
 *   **Predictive Premium Modeling**: Utilizing historical disruption frequency and forecasted severity to generate fair, actuarial-backed quotes.
 *   **Explainable AI (XAI)**: Every score includes a transparency layer, allowing both admins and workers to understand the risk contributors (e.g., "High risk detected due to cumulative rainfall (120mm) and increased traffic congestion").
 *   **Administrative Governance**: A specialized underwriting console allows for manual policy overrides with built-in audit trails and automated expiry logic.
@@ -95,5 +97,7 @@ npm run dev
 - **Computer Vision Verification**: Lightweight ResNet models to verify flooding via user-submitted imagery.
 - **Advanced Streaming**: Transitioning to Apache Flink for true sliding-window geo-telemetry analysis.
 
----
-*Developed for the Guidewire DEVTrails Hackathon 2026.*
+## 🏁 Conclusion
+
+Q-Shield is not just an insurance platform —  
+it is a real-time AI-powered risk intelligence system that predicts, prices, and protects gig worker income before disruption occurs.
