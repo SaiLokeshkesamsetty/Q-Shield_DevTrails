@@ -9,7 +9,7 @@
 
 ### [Pitch Deck]
 **View our Vision for Gig Resilience:**  
-[👉 CLICK HERE TO VIEW PITCH DECK](https://link-to-your-pitch-deck.com)
+[👉 CLICK HERE TO VIEW PITCH DECK](https://q-shield.vercel.app/)
 
 ### [Recorded Video]
 **Watch the Q-Shield Platform in Action:**  
