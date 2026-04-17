@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, MapPin, Smartphone, ShieldCheck, Mail, Phone, CreditCard, Activity, UploadCloud, Bell, Shield, Edit2, Lock, History, AlertTriangle, Fingerprint, Camera, Building, CheckCircle2, Zap } from 'lucide-react';
-import { fetchDashboard, updateWorkerProfile } from '../api';
+import { fetchDashboard, updateWorkerProfile, verifyGigPlatform } from '../api';
 import toast from 'react-hot-toast';
 
 export default function ProfilePage({ user }) {
@@ -9,7 +9,11 @@ export default function ProfilePage({ user }) {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyingStep, setVerifyingStep] = useState('IDLE'); // IDLE, UPLOADING, SCANNING, SUCCESS
+  const [scanProgress, setScanProgress] = useState(0);
   const fileInputRef = useRef(null);
+  const verifyInputRef = useRef(null);
 
   useEffect(() => {
      if(user) loadProfileData();
@@ -79,7 +83,45 @@ export default function ProfilePage({ user }) {
           }
       };
       reader.readAsDataURL(file);
+  const handleVerifyPlatform = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      setVerifyingStep('UPLOADING');
+      setIsVerifying(true);
+
+      // 🔄 Simulated Upload phase
+      setTimeout(() => {
+          setVerifyingStep('SCANNING');
+          let progress = 0;
+          const interval = setInterval(() => {
+              progress += 5;
+              setScanProgress(progress);
+              if (progress >= 100) {
+                  clearInterval(interval);
+                  finalizeVerification();
+              }
+          }, 100);
+      }, 1000);
   };
+
+  const finalizeVerification = async () => {
+      try {
+          const res = await verifyGigPlatform(user.worker_id, w.platform, 'mock_b64');
+          if (res.success) {
+              setVerifyingStep('SUCCESS');
+              toast.success('Gig Identity Verified', { icon: '🛡️' });
+              setTimeout(() => {
+                  setIsVerifying(false);
+                  loadProfileData();
+              }, 3000);
+          }
+      } catch (err) {
+          toast.error('AI Scan Failure');
+          setIsVerifying(false);
+      }
+  };
+
 
   const handleSimulateUpload = (docType) => {
       const tid = toast.loading(`Encrypting & uploading ${docType}...`);
@@ -267,13 +309,45 @@ export default function ProfilePage({ user }) {
                      Compliance & Security <Lock className="w-4 h-4 text-slate-400"/>
                   </h2>
                   
-                  <div className="space-y-3">
-                      <button onClick={()=>handleSimulateUpload('Identity Proof')} className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-dashed border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 transition-colors group">
-                           <div className="flex items-center text-sm font-bold text-slate-600 group-hover:text-indigo-600">
-                               <UploadCloud className="w-5 h-5 mr-3"/> Upload ID Proof
+                      <div className="space-y-4">
+                           <div className={`p-5 rounded-2xl border-2 transition-all duration-500 ${w.is_gig_verified ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200 border-dashed'}`}>
+                               <div className="flex justify-between items-start mb-4">
+                                   <div>
+                                       <h3 className={`text-sm font-black uppercase tracking-widest ${w.is_gig_verified ? 'text-emerald-700' : 'text-slate-500'}`}>
+                                         {w.is_gig_verified ? 'Verified Platform Partner' : 'Gig Status: Unverified'}
+                                       </h3>
+                                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Proof of Platform (PoP)</p>
+                                   </div>
+                                   {w.is_gig_verified ? (
+                                       <div className="bg-emerald-500 p-1.5 rounded-full"><CheckCircle2 className="w-4 h-4 text-white" /></div>
+                                   ) : (
+                                       <AlertTriangle className="w-5 h-5 text-amber-500" />
+                                   )}
+                               </div>
+                               
+                               {!w.is_gig_verified && (
+                                   <button 
+                                       onClick={() => verifyInputRef.current?.click()}
+                                       className="w-full py-3 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest text-slate-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all shadow-sm flex items-center justify-center group"
+                                   >
+                                       <Camera className="w-4 h-4 mr-2 group-hover:animate-bounce" /> Start AI Identity Scan
+                                   </button>
+                               )}
+                               
+                               <input type="file" ref={verifyInputRef} onChange={handleVerifyPlatform} className="hidden" accept="image/*" />
+                               
+                               <p className="text-[10px] text-slate-400 mt-4 font-medium leading-relaxed italic">
+                                   *Upload a screenshot of your {w.platform} profile. Our engine uses OCR to verify active status.
+                               </p>
                            </div>
-                           {isKycVerified && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-                      </button>
+
+                           <button onClick={()=>handleSimulateUpload('Identity Proof')} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors group">
+                                <div className="flex items-center text-sm font-bold text-slate-600">
+                                    <UploadCloud className="w-5 h-5 mr-3 text-slate-300"/> Submit PAN/Aadhar
+                                </div>
+                                {isKycVerified && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                           </button>
+                       </div>
                       
                       <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 mt-4">
                            <div className="flex items-center">
@@ -355,12 +429,86 @@ export default function ProfilePage({ user }) {
 
       </div>
 
+      {/* 🧬 AI VERIFICATION MODAL OVERLAY */}
+      {isVerifying && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/90 backdrop-blur-xl p-4">
+              <div className="max-w-md w-full bg-slate-900 border border-white/10 rounded-[2.5rem] p-10 relative overflow-hidden shadow-[0_0_50px_rgba(79,70,229,0.3)]">
+                  
+                  {/* Background Accents */}
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 animate-pulse"></div>
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none select-none text-[8px] font-mono leading-tight whitespace-pre">
+                      {`Q_SHIELD_V_SCAN_LOG: 0x82...
+SEARCHING_PIXELS_FOR_${w.platform.toUpperCase()}...
+OCR_BUFFER_INIT...
+EXTRACTING_WORKER_META...
+GEO_TAG_VALIDATION...`.repeat(20)}
+                  </div>
+
+                  <div className="relative z-10 text-center">
+                    {verifyingStep === 'UPLOADING' && (
+                        <div className="space-y-6">
+                            <div className="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                                <UploadCloud className="w-10 h-10 text-indigo-400" />
+                            </div>
+                            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Vaulting Asset...</h2>
+                            <p className="text-slate-400 text-sm font-medium">Encrypting payload for AI analysis.</p>
+                        </div>
+                    )}
+
+                    {verifyingStep === 'SCANNING' && (
+                        <div className="space-y-8">
+                             <div className="relative w-32 h-32 mx-auto">
+                                 <div className="absolute inset-0 border-4 border-indigo-500/20 rounded-full"></div>
+                                 <div className="absolute inset-0 border-4 border-indigo-500 rounded-full border-t-transparent animate-spin"></div>
+                                 <div className="absolute inset-0 flex items-center justify-center flex-col">
+                                     <Fingerprint className="w-12 h-12 text-indigo-400 animate-pulse" />
+                                     <span className="text-white font-mono font-black text-xl mt-2">{scanProgress}%</span>
+                                 </div>
+                             </div>
+                             
+                             <div className="space-y-3">
+                                <h2 className="text-2xl font-black text-white uppercase tracking-tighter animate-pulse">Scanning Platform ID</h2>
+                                <div className="flex justify-center space-x-1">
+                                    <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded">DETECTING: {w.platform}</div>
+                                </div>
+                                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-4">
+                                    <div className="h-full bg-indigo-500 transition-all duration-100" style={{width: `${scanProgress}%`}}></div>
+                                </div>
+                             </div>
+                        </div>
+                    )}
+
+                    {verifyingStep === 'SUCCESS' && (
+                        <div className="space-y-6 py-6 font-outfit">
+                            <div className="w-24 h-24 bg-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(16,185,129,0.4)] animate-scale-in">
+                                <CheckCircle2 className="w-12 h-12 text-white" />
+                            </div>
+                            <h2 className="text-4xl font-black text-white tracking-tight">VERIFIED</h2>
+                            <p className="text-emerald-400 font-bold uppercase tracking-[0.2em] text-xs">Partner Authentication Confirmed</p>
+                            
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mt-8">
+                                <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Assigned Trust ID</div>
+                                <div className="text-indigo-300 font-mono text-sm tracking-widest">Q-SHIELD-TR-9941X</div>
+                            </div>
+                        </div>
+                    )}
+                  </div>
+              </div>
+          </div>
+      )}
+
       <style dangerouslySetInnerHTML={{__html:`
           .custom-scrollbar::-webkit-scrollbar { width: 4px; }
           .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
           .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
           
           input[type=checkbox]:checked + label { background-color: #4f46e5; }
+
+          @keyframes scale-in {
+              0% { transform: scale(0.5); opacity: 0; }
+              100% { transform: scale(1); opacity: 1; }
+          }
+          .animate-scale-in { animation: scale-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
       `}}/>
     </div>
   );

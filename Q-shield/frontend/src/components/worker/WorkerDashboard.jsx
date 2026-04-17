@@ -110,9 +110,14 @@ export default function WorkerDashboard({ user }) {
                             <div className="absolute -bottom-1 -right-1 h-7 w-7 bg-emerald-500 border-4 border-slate-900 rounded-full shadow-[0_0_15px_#10b981]"></div>
                         </div>
                         <div>
-                            <h1 className="text-5xl font-black text-white tracking-tighter font-outfit italic mb-3 drop-shadow-sm">
-                                Hi, {user?.name || user?.full_name || 'Worker'}
-                            </h1>
+                             <h1 className="text-5xl font-black text-white tracking-tighter font-outfit italic mb-3 drop-shadow-sm flex items-center">
+                                 Hi, {workerProfile?.name?.split(' ')[0] || 'Worker'}
+                                 {workerProfile?.is_gig_verified && (
+                                     <div className="ml-3 bg-indigo-500 p-1.5 rounded-full shadow-[0_0_15px_#4f46e5] border border-white/20">
+                                         <ShieldCheck className="w-5 h-5 text-white" />
+                                     </div>
+                                 )}
+                             </h1>
                             <div className="flex items-center space-x-4">
                                 <div className="flex items-center bg-white/5 border border-white/10 px-4 py-2 rounded-2xl backdrop-blur-md hover:bg-white/10 transition-colors">
                                     <MapPin className="w-3.5 h-3.5 mr-2 text-indigo-400"/> 

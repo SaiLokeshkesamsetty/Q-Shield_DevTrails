@@ -248,6 +248,40 @@ router.patch('/:id/profile', async (req, res) => {
     }
 });
 
+// Verify Gig App Platform (Simulated AI Scan)
+router.post('/:id/verify-gig-app', async (req, res) => {
+    const { platform, screenshot } = req.body;
+    const workerId = req.params.id;
+
+    console.log(`🔍 [AI Scanner] Initiating verification for worker ${workerId} on ${platform}...`);
+    
+    // Simulate high-complexity OCR/Pattern matching processing delay
+    await new Promise(resolve => setTimeout(resolve, 2500)); 
+
+    try {
+        const query = `
+            UPDATE workers 
+            SET is_gig_verified = TRUE, verified_gig_platform = $1, trust_score = LEAST(trust_score + 15, 100)
+            WHERE worker_id = $2
+            RETURNING *
+        `;
+        const { rows } = await pool.query(query, [platform, workerId]);
+        
+        if (rows.length === 0) return res.status(404).json({ error: 'Worker not found' });
+        
+        console.log(`✅ [AI Scanner] Verification Success: ${platform}`);
+        res.json({
+            success: true,
+            message: `Identity verified as active ${platform} partner.`,
+            worker: rows[0],
+            verification_id: `VER-GIG-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+        });
+    } catch (err) {
+        console.error("❌ [AI Scanner] Verification Critical Failure:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Get Single Worker Profile
 router.get('/:id/profile', async (req, res) => {
     try {

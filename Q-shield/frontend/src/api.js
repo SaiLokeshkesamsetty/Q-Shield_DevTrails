@@ -194,3 +194,13 @@ export const fetchWorkerPremium = async (workerId) => {
         return null;
     }
 };
+
+export const verifyGigPlatform = async (workerId, platform, screenshot) => {
+    try {
+        const res = await axios.post(`${API_BASE}/workers/${workerId}/verify-gig-app`, { platform, screenshot });
+        return res.data;
+    } catch(e) {
+        console.error("Gig Verification Error:", e.message);
+        return { success: false, error: e.response?.data?.error || e.message };
+    }
+};
