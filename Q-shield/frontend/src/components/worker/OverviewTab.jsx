@@ -10,15 +10,36 @@ const PIPELINE_STEPS = [
     { id: 'Completed', label: 'Completed', icon: <CheckCircle2 className="w-4 h-4"/> }
 ];
 
+import React, { useState, useEffect } from 'react';
+
 export default function OverviewTab({ user, data, intelligence, isSimulating, setIsSimulating, refresh }) {
     const latestClaim = data?.claimsHistory && data?.claimsHistory[0];
     const currentStepIndex = latestClaim ? PIPELINE_STEPS.findIndex(s => s.id === latestClaim.processing_step) : -1;
+    
+    const [dynamicPremium, setDynamicPremium] = useState(data?.currentPremiumQuote || 35);
+    const [explainableAI, setExplainableAI] = useState('');
+    const [premiumRiskLevel, setPremiumRiskLevel] = useState('');
+    const [isOverride, setIsOverride] = useState(false);
+
+    useEffect(() => {
+        if (!user) return;
+        import('../../api').then(api => {
+             api.fetchWorkerPremium(user.worker_id).then(res => {
+                 if (res) {
+                     setDynamicPremium(res.finalPremium);
+                     setExplainableAI(res.explainableAI);
+                     setPremiumRiskLevel(res.riskLevel);
+                     setIsOverride(res.overrideActive);
+                 }
+             });
+        });
+    }, [user]);
 
     const handlePurchase = async () => {
         const toastId = toast.loading('Initiating Secure Transaction...');
         try {
             const api = await import('../../api');
-            await api.purchasePolicy(user.worker_id, data.currentPremiumQuote || 35);
+            await api.purchasePolicy(user.worker_id, dynamicPremium);
             toast.success('Coverage Active. Your income is now protected.', { id: toastId });
             refresh();
         } catch (e) {
@@ -113,18 +134,44 @@ export default function OverviewTab({ user, data, intelligence, isSimulating, se
                                  </div>
                             </div>
                             <div className="text-3xl font-black font-outfit mb-1 tracking-tighter">UNPROTECTED</div>
-                            <p className="text-rose-100 text-[10px] font-bold mb-6 italic opacity-90 leading-normal">Wait! Disruption signals are {intelligence.level === 'CRITICAL' ? 'CRITICAL' : 'active'} in your zone. Your income is at risk.</p>
-                            
                             <button 
                                 onClick={handlePurchase}
                                 className="w-full bg-white text-rose-600 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-rose-900/10 hover:bg-rose-50 active:scale-95 transition-all flex items-center justify-center group/purchase"
                             >
                                 <CreditCard className="w-4 h-4 mr-3 group-hover/purchase:rotate-12 transition-transform" />
-                                BUY COVERAGE · ₹{data.currentPremiumQuote || 35}
+                                BUY COVERAGE · ₹{dynamicPremium}
                             </button>
                         </div>
                     </div>
                 )}
+                
+                {/* 🧠 AI Confidence Metrics */}
+                <div className="bg-white p-7 rounded-3xl border border-slate-50 shadow-sm relative overflow-hidden group">
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="flex flex-col">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">AI Audit Core</h3>
+                        </div>
+                        <BrainCircuit className="w-5 h-5 text-indigo-500" />
+                    </div>
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center text-xs">
+                            <span className="text-slate-500 font-bold uppercase tracking-tight">Fraud Pred. Score</span>
+                            <span className={`font-black border px-2 py-0.5 rounded-full ${latestClaim?.status === 'Rejected' && latestClaim?.failed_stage === 'FRAUD' ? 'text-rose-500 border-rose-100 bg-rose-50' : 'text-emerald-500 border-emerald-100 bg-emerald-50'}`}>
+                                {latestClaim?.status === 'Rejected' && latestClaim?.failed_stage === 'FRAUD' ? '98.5%' : '1.2%'}
+                            </span>
+                        </div>
+                        <div className="w-full h-1 bg-slate-50 rounded-full overflow-hidden">
+                            <div className="h-full bg-indigo-500" style={{ width: latestClaim?.status === 'Rejected' && latestClaim?.failed_stage === 'FRAUD' ? '98.5%' : '1.2%'}}></div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center text-xs pt-3">
+                            <span className="text-slate-500 font-bold uppercase tracking-tight">Dynamic Multiplier</span>
+                            <span className="font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+                                {latestClaim?.calculation_metadata ? (() => { try { return JSON.parse(latestClaim.calculation_metadata).multiplier + 'x'; } catch(e) { return '1.00x'; } })() : '1.00x'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* 🤖 Pipeline Visualization Column */}

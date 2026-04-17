@@ -10,6 +10,7 @@ import { useRiskIntelligence } from '../../hooks/useRiskIntelligence';
 import TabNavigation from './TabNavigation';
 import OverviewTab from './OverviewTab';
 import HistoryTab from './HistoryTab';
+import TelemetryHUD from './TelemetryHUD';
 
 // Lazy Loaded Radar Portal (Enterprise Performance)
 const RadarPortal = React.lazy(() => import('../radar/RadarPortal'));
@@ -55,41 +56,20 @@ export default function WorkerDashboard({ user }) {
     // 4. Intelligence Monitor: Alerts handled via UI cards instead of intrusive popups
     // (Removed auto-toast useEffect as per UI refinement request)
 
-    const handleModeToggle = async () => {
-        // Toggle between DEMO and LIVE
-        const newMode = workerProfile.mode === 'DEMO' ? 'LIVE' : 'DEMO';
-        const toastId = toast.loading(`Switching to ${newMode} Mode...`);
-        try {
-            const { updateWorkerStatus } = await import('../../api');
-            const lat = workerProfile.latitude || workerProfile.last_location?.lat || 17.3850;
-            const lng = workerProfile.longitude || workerProfile.last_location?.lng || 78.4867;
-            
-            console.log(`📡 [Sync] Toggling mode to ${newMode} at: ${lat}, ${lng}`);
-            const res = await updateWorkerStatus(workerProfile.worker_id, lat, lng, newMode);
-            if (res.success && res.worker) {
-                toast.success(`System Online: ${newMode} Mode Active`, { id: toastId });
-                setWorkerProfile(res.worker); // 🚀 Immediate UI Update
-                refresh();
-            } else {
-                throw new Error('Update failed');
-            }
-        } catch (e) {
-            toast.error('Sync failed. Please try again.', { id: toastId });
-        }
-    };
+
 
     const handleSimulateDisruption = async () => {
         // The simulation now always performs strict weather and fraud audits against real API endpoints.
 
         setTriggering(true);
-        const toastId = toast.loading(workerProfile.mode === 'DEMO' ? 'Executing Demo Payout Flow...' : 'Initiating Strict Parametric Audit...');
+        const toastId = toast.loading('Initiating Strict Parametric Audit...');
         try {
             const api = await import('../../api');
             const lat = workerProfile.latitude || workerProfile.last_location?.lat;
             const lng = workerProfile.longitude || workerProfile.last_location?.lng;
             
-            await api.simulateRainTrigger('RAIN', workerProfile.home_zone || 'Hyderabad', lat, lng, workerProfile.worker_id, workerProfile.mode);
-            toast.success(`⚡ Signal Logged: Processing ${workerProfile.mode} Pipeline`, { id: toastId });
+            await api.simulateRainTrigger('RAIN', workerProfile.home_zone || 'Hyderabad', lat, lng, workerProfile.worker_id, 'LIVE');
+            toast.success(`⚡ Signal Logged: Processing Security Pipeline`, { id: toastId });
             setIsSimulating(true);
             
             // 🚀 Multi-stage pulse to capture the final audit state in history
@@ -106,8 +86,16 @@ export default function WorkerDashboard({ user }) {
     if (loading || !data) return <div className="p-20 text-center font-black animate-pulse text-indigo-500 uppercase tracking-[20px]">SYNCING_AI_CORE</div>;
 
     return (
-        <div className="min-h-screen bg-transparent command-grid py-12 animate-in fade-in duration-1000">
-            <div className="max-w-7xl mx-auto px-4 lg:px-8 space-y-8">
+        <div className={`min-h-screen bg-transparent command-grid py-12 transition-all duration-1000 animate-in fade-in ${intelligence.level === 'CRITICAL' ? 'bg-rose-500/[0.02]' : ''}`}>
+            {/* 📡 Telemetry HUD - Elite Situational Awareness */}
+            <TelemetryHUD data={data} intelligence={intelligence} />
+            
+            {/* 🧪 Ambient Risk Pulse */}
+            {intelligence.level === 'CRITICAL' && (
+                <div className="fixed inset-0 pointer-events-none z-0 border-[32px] border-rose-500/5 animate-pulse-slow"></div>
+            )}
+
+            <div className="max-w-7xl mx-auto px-4 lg:px-8 space-y-8 relative z-10">
                 
                 {/* 🚀 Premium Orchestrator Header */}
                 <div className="bg-slate-900/80 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] flex flex-col md:flex-row items-center justify-between gap-10 group relative overflow-hidden">
@@ -131,9 +119,9 @@ export default function WorkerDashboard({ user }) {
                                     <span className="text-slate-300 font-bold uppercase tracking-[0.2em] text-[10px]">{user?.home_zone || 'Nexus'} Zone</span>
                                 </div>
                                  <div className="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl">
-                                    <div className={`h-1.5 w-1.5 rounded-full ${workerProfile?.mode === 'DEMO' ? 'bg-purple-500 animate-pulse shadow-[0_0_8px_#a855f7]' : 'bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]'}`}></div>
-                                    <span className={`${workerProfile?.mode === 'DEMO' ? 'text-purple-400' : 'text-emerald-400'} font-black text-[10px] uppercase tracking-widest italic`}>
-                                        {workerProfile?.mode === 'DEMO' ? '🧪 Demo Mode Ready' : '🟢 Live Mode'}
+                                    <div className={`h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]`}></div>
+                                    <span className={`text-emerald-400 font-black text-[10px] uppercase tracking-widest italic`}>
+                                        🟢 SYSTEM ONLINE
                                     </span>
                                 </div>
                             </div>
@@ -142,17 +130,6 @@ export default function WorkerDashboard({ user }) {
                     
                     <div className="flex flex-col items-end gap-5 relative z-10">
                         <div className="flex space-x-4">
-                            <button 
-                                onClick={handleModeToggle}
-                                className={`text-white px-8 py-5 rounded-2xl flex items-center font-black text-xs transition-all shadow-xl active:scale-95 uppercase tracking-widest group/btn border
-                                    ${workerProfile.mode === 'DEMO' 
-                                        ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-900/20 border-purple-400' 
-                                        : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/20 border-emerald-400'}
-                                `}
-                            >
-                                <ShieldCheck className="w-4 h-4 mr-3 group-hover/btn:rotate-12 transition-transform" />
-                                {workerProfile.mode === 'DEMO' ? 'SWITCH TO LIVE' : 'SWITCH TO DEMO'}
-                            </button>
                             <button 
                                 onClick={handleSimulateDisruption} 
                                 disabled={triggering} 
@@ -203,6 +180,15 @@ export default function WorkerDashboard({ user }) {
                     )}
                 </div>
             </div>
+            <style dangerouslySetInnerHTML={{ __html: `
+                @keyframes pulse-slow {
+                    0%, 100% { opacity: 0.3; }
+                    50% { opacity: 0.8; }
+                }
+                .animate-pulse-slow {
+                    animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                }
+            `}} />
         </div>
     );
 }

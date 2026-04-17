@@ -15,9 +15,7 @@ const pool = require('../db');
  * @returns {{isValid: boolean, reason?: string}}
  */
 function validateWeatherThreshold(eventType, severity, severityString, mode = 'LIVE', liveParams = null, traffic = null) {
-    if (mode === 'DEMO') {
-        return { isValid: true };
-    }
+
 
     // ⚡ ENTERPRISE THRESHOLDS
     const RAIN_THRESHOLD = 50.0; // 50mm
@@ -65,12 +63,7 @@ async function validateEligibility(workerId, triggerZone, mode = 'LIVE') {
     try {
         console.log(`[Underwriting] Validating worker ${workerId} (Mode: ${mode})`);
         
-        // 🧪 DEMO MODE: Force success for demo runs
-        if (mode === 'DEMO') {
-            console.log(`[Underwriting] ✅ DEMO Mode Active. Granting Automated Eligibility.`);
-            const workerRes = await pool.query("SELECT tier FROM workers WHERE worker_id = $1", [workerId]);
-            return { isEligible: true, tier: workerRes.rows[0]?.tier || 'LOW' };
-        }
+
         const query = `
             SELECT worker_id, home_zone, active_days_last_30, tier 
             FROM workers 

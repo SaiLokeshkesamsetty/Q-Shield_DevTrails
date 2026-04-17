@@ -162,3 +162,35 @@ export const updateWorkerProfile = async (workerId, updateData) => {
         return { success: false, error: e.message };
     }
 };
+
+export const fetchZoneForecast = async (zone) => {
+    try {
+        const res = await axios.get(`${API_BASE}/admin/forecast?zone=${encodeURIComponent(zone)}`);
+        return res.data;
+    } catch(e) {
+        console.error("Failed to fetch 7-day forecast:", e.message);
+        return null; // Handle generically in UI
+    }
+};
+
+export const overrideWorkerPremium = async (workerId, customPremium, aiSuggestedPremium, reason, expiresAt) => {
+    try {
+        const res = await axios.post(`${API_BASE}/admin/workers/${workerId}/premium`, {
+            customPremium, aiSuggestedPremium, reason, expiresAt
+        });
+        return { success: true, data: res.data };
+    } catch(e) {
+        console.error("Failed to override premium:", e.message);
+        return { success: false, error: e.response?.data?.error || e.message };
+    }
+};
+
+export const fetchWorkerPremium = async (workerId) => {
+    try {
+        const res = await axios.get(`${API_BASE}/workers/${workerId}/premium`);
+        return res.data;
+    } catch(e) {
+        console.error("Failed to fetch dynamic premium:", e.message);
+        return null;
+    }
+};

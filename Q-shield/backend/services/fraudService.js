@@ -24,11 +24,7 @@ async function validateWorkerLocation(workerId, triggerCenter, radiusKm = 5.0, m
 
         const worker = rows[0];
         
-        // 🚀 DEMO MODE: Bypass fraud checks for demo runs
-        if (mode === 'DEMO') {
-            console.log(`[Fraud] 🧪 DEMO Mode Active. Auto-Approving location integrity for worker ${workerId}.`);
-            return { isValid: true, distance: 0 };
-        }
+
 
         // --- 🥇 Location Logic (Direct Registration Prioritized) ---
         // We use the Latitude/Longitude selected during map registration for 100% precision

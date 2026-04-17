@@ -75,7 +75,7 @@ triggerEngine.on('TRIGGER_FIRED', async (triggerData) => {
  */
 async function processIndividualClaim(worker, trigger) {
     let claimId = null;
-    let mode = worker.mode || 'LIVE'; // From DB
+    let mode = 'LIVE'; // Strict live audit
 
     try {
         // --- PRE-PIPELINE: Create Idempotent Claim Record ---
@@ -92,6 +92,23 @@ async function processIndividualClaim(worker, trigger) {
             return;
         }
         claimId = claimRes.rows[0].claim_id;
+
+        // --- STAGE 0: DAILY LIMIT CHECK (Auto-trigger limit) ---
+        // Ensure money is sent automatically only ONE time for a day
+        const dailyLimitQuery = `
+            SELECT claim_id 
+            FROM claims 
+            WHERE policy_id = $1 
+            AND status IN ('Approved', 'Paid', 'Processing')
+            AND created_at >= CURRENT_DATE
+            AND claim_id != $2
+        `;
+        const dailyLimitRes = await pool.query(dailyLimitQuery, [worker.policy_id, claimId]);
+        if (dailyLimitRes.rows.length > 0) {
+            console.log(`[LCP] 🛑 Auto-Trigger Blocked. Worker ${worker.worker_id} already received a payout/claim today.`);
+            await pool.query(`UPDATE claims SET status = 'Rejected', failed_stage = 'POLICY_LIMIT', rejection_reason = 'Daily limit reached (1 claim per day)' WHERE claim_id = $1`, [claimId]);
+            return;
+        }
 
         // --- STAGE 1: THRESHOLD VALIDATION ---
         console.log(`[LCP] 📡 STAGE 1: Threshold Verification (Mode: ${mode})`);
@@ -126,7 +143,7 @@ async function processIndividualClaim(worker, trigger) {
         // --- STAGE 3: FRAUD / PROXIMITY CHECK ---
         await updateStep(claimId, 'Fraud_Verifying');
         console.log(`[LCP] 🕵️ STAGE 3: Fraud & Proximity Audit`);
-        const { isValid: isLocationValid, reason: fraudReason } = await fraudService.validateWorkerLocation(
+        const { isValid: isLocationValid, distance, reason: fraudReason } = await fraudService.validateWorkerLocation(
             worker.worker_id, 
             trigger.centerLoc, 
             trigger.radiusKm,
@@ -138,24 +155,85 @@ async function processIndividualClaim(worker, trigger) {
             return;
         }
 
+        // Feature 2: Behavioral Analytics System
+        try {
+             // We inject ML Behavioral Checking here 
+             // Normally we would query lifetime claim frequency, setting nominal to 2 for hackathon
+             console.log(`[LCP] 🧠 Contacting AI Fraud Engine for Confidence Score...`);
+             const fraudResponse = await fetch('http://127.0.0.1:8000/api/predict_fraud', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({
+                     distance_km: distance || 0.0,
+                     recent_claims: 2, // Would be a DB query COUNT(*)
+                     hour: new Date().getHours() // Timestamp feature injection
+                 })
+             });
+             
+             if (fraudResponse.ok) {
+                 const fraudData = await fraudResponse.json();
+                 console.log(`[LCP] 🤖 AI Fraud Engine responded: Risk = ${fraudData.fraud_probability}%, Valid = ${fraudData.is_safe}`);
+                 if (!fraudData.is_safe) {
+                     await rejectClaim(claimId, 'FRAUD', `AI Anomaly Detection Flagged Activity (Confidence: ${fraudData.fraud_probability}%)`);
+                     return;
+                 }
+             }
+        } catch(e) {
+             console.warn(`[LCP] ⚠️ AI Prediction Service offline. Proceeding with standard GPS boundary checks.`, e.message);
+        }
+
         // --- STAGE 4: PAYOUT CALCULATION & DISBURSEMENT ---
         await updateStep(claimId, 'Payout_Calculating');
         
-        const baseAmount = 150;
-        const severityMult = trigger.eventType.includes('Air') ? (trigger.severityNumeric > 380 ? 2.5 : 1.5) : (trigger.severityNumeric > 70 ? 2.0 : 1.2);
-        const durationFactor = 1 + ((trigger.durationHours - 1) * 0.2); 
+        let PAYOUT_AMOUNT = 150;
+        let severityScore = 0;
+        let aiMultiplier = 1.0;
         
-        let PAYOUT_AMOUNT = Math.round(baseAmount * severityMult * durationFactor);
-        if (PAYOUT_AMOUNT > 500) PAYOUT_AMOUNT = 500;
+        // Add robust fallback for liveParams and traffic objects in trigger
+        const liveParams = trigger.liveParams || { rain: 0, aqi: 50, temp: 30 };
+        const trafficParams = trigger.traffic || { delay: 0, speedRatio: 1.0 };
+        
+        // Feature 3: Dynamic Multi-Event Payout Engine via ML Model
+        try {
+             // We use native fetch (available in Node 18+)
+             console.log(`[LCP] 🧠 Contacting AI Risk Engine for Dynamic Scoring...`);
+             const riskResponse = await fetch('http://127.0.0.1:8000/api/predict_risk', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({
+                     rain_mm: liveParams.rain || 0,
+                     aqi: liveParams.aqi || 50,
+                     temp: liveParams.temp || 30,
+                     traffic_delay_min: (1.0 - (trafficParams.speedRatio || 1.0)) * 60
+                 })
+             });
+             if (riskResponse.ok) {
+                 const riskData = await riskResponse.json();
+                 severityScore = riskData.calculated_risk_score || 0;
+                 aiMultiplier = 1 + (severityScore / 100);
+                 console.log(`[LCP] 🤖 AI Risk Engine responded. Severity: ${severityScore}, Multiplier: ${aiMultiplier.toFixed(2)}x`);
+             } else {
+                 throw new Error("AI Prediction Service offline or non-200");
+             }
+        } catch(e) {
+             console.warn(`[LCP] ⚠️ AI Prediction Service offline. Falling back to rule-based actuarial math.`, e.message);
+             // Legacy fallback (as the user requested)
+             const severityMult = trigger.eventType.includes('Air') ? (trigger.severityNumeric > 380 ? 2.5 : 1.5) : (trigger.severityNumeric > 70 ? 2.0 : 1.2);
+             const durationFactor = 1 + ((trigger.durationHours - 1) * 0.2); 
+             aiMultiplier = severityMult * durationFactor;
+        }
+
+        PAYOUT_AMOUNT = Math.round(150 * aiMultiplier);
+        if (PAYOUT_AMOUNT > 1000) PAYOUT_AMOUNT = 1000; // Cap to prevent bankruptcy on overlapping disasters
 
         const metadata = {
-            base: baseAmount,
-            severity: trigger.severityNumeric,
-            multiplier: severityMult,
+            base: 150,
+            severity: trigger.severityNumeric || severityScore,
+            multiplier: parseFloat(aiMultiplier.toFixed(2)),
             duration: trigger.durationHours,
             tier: tier,
             final_payout: PAYOUT_AMOUNT,
-            reason: trigger.eventType.includes('Air') ? `AQI ${trigger.severityNumeric} detected` : `Rainfall ${trigger.severityNumeric}mm detected`
+            reason: trigger.eventType.includes('Air') ? `AQI Alert + ML Multiplier` : `Weather Anomaly + ML Multiplier`
         };
 
         // Finalize Claim & Payout

@@ -43,7 +43,7 @@ export default function LandingPage({ user }) {
                          <Zap className="text-red-500 w-8 h-8 animate-pulse"/>
                      </div>
                      <div>
-                         <p className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-tight mb-1">Live Trigger Demo</p>
+                         <p className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-tight mb-1">Live Trigger System</p>
                          <p className="font-black text-2xl text-red-900 leading-none">High Risk Detected</p>
                      </div>
                   </div>

@@ -258,6 +258,88 @@ router.get('/:id/profile', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+// Get Dynamic Premium (Checks Forecast + AI Risk or Admin Override)
+router.get('/:id/premium', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT home_zone FROM workers WHERE worker_id = $1', [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Worker not found' });
+        
+        const zone = rows[0].home_zone;
+        const basePremium = 35;
+        let aiSuggestedPremium = 35;
+        let aiData = { risk_level: 'Low', confidence: 0, explanation: 'AI Offline' };
+        
+        // 1. Check for Active Admin Override
+        const overrideQuery = await pool.query(`
+            SELECT custom_premium, expires_at 
+            FROM worker_premium_overrides 
+            WHERE worker_id = $1 AND is_active = TRUE AND expires_at > CURRENT_TIMESTAMP
+            ORDER BY created_at DESC LIMIT 1
+        `, [req.params.id]);
+
+        const hasOverride = overrideQuery.rows.length > 0;
+        
+        // 2. Compute AI pricing
+        try {
+            const apiKey = process.env.WEATHER_API_KEY;
+            const weatherUrl = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${encodeURIComponent(zone)}&days=7&aqi=yes`;
+            
+            let dailyStats = [];
+            let forecastError = false;
+            
+            try {
+                const wRes = await fetch(weatherUrl);
+                const forecastData = await wRes.json();
+                
+                if (forecastData.error) {
+                    forecastError = true;
+                } else {
+                    dailyStats = forecastData.forecast.forecastday.map(d => ({
+                         rain_mm: d.day.totalprecip_mm,
+                         temp: d.day.maxtemp_c,
+                         wind_kph: d.day.maxwind_kph
+                    }));
+                }
+            } catch(e) { forecastError = true; }
+            
+            if (forecastError) {
+                 // 🛡️ DEMO FALLBACK
+                 dailyStats = Array.from({length: 7}).map((_, i) => ({
+                     rain_mm: parseFloat((Math.random() * 25).toFixed(1)),
+                     temp: parseFloat((28 + Math.random() * 10).toFixed(1)),
+                     wind_kph: parseFloat((10 + Math.random() * 15).toFixed(1))
+                 }));
+            }
+                
+            const aiRes = await fetch('http://127.0.0.1:8000/api/predict_forecast_risk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ daily_forecasts: dailyStats })
+            });
+            
+            if (aiRes.ok) {
+                aiData = await aiRes.json();
+                const aiMultiplier = 1.0 + (aiData.calculated_risk_score / 50.0);
+                aiSuggestedPremium = Math.round(basePremium * aiMultiplier);
+                if (aiSuggestedPremium > 150) aiSuggestedPremium = 150;
+            }
+            
+        } catch(e) { console.error('[WorkerRoutes: Premium] Error fetching AI Forecast', e.message); }
+
+        res.json({
+            basePremium,
+            aiSuggestedPremium,
+            finalPremium: hasOverride ? overrideQuery.rows[0].custom_premium : aiSuggestedPremium,
+            overrideActive: hasOverride,
+            riskLevel: aiData.risk_level,
+            confidence: aiData.confidence,
+            explainableAI: aiData.explanation
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;
 

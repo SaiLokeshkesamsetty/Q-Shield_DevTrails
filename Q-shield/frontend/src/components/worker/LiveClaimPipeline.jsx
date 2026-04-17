@@ -148,7 +148,7 @@ export default function LiveClaimPipeline({ user, onComplete }) {
                         Live Claim Process
                     </h3>
                     <p className="text-[9px] font-black text-indigo-500 mt-1 uppercase tracking-[3px] italic">
-                        {claimData?.mode === 'DEMO' ? '🧪 Synthetic Demo Execution Active' : '🟢 Real-World Parametric Audit Active'}
+                        🟢 Real-World Parametric Audit Active
                     </p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
