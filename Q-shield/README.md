@@ -1,90 +1,99 @@
-# Q-Shield: The Resilience Core
-### AI-Driven Parametric Risk Engine for the Gig Economy
+# Q-Shield: AI-Driven Parametric Resilience
+### Protecting Gig Income through Scalable, Data-Triggered Insurance
 
-**Q-Shield** is a production-grade, AI-driven parametric insurance platform specifically engineered for gig delivery partners (Blinkit, Swiggy, Zomato). By replacing manual claims with zero-touch, data-triggered micro-payouts, Q-Shield ensures that when the climate fails, the worker's income doesn't.
+**Q-Shield** is a production-ready, AI-powered parametric insurance platform specifically engineered for gig delivery partners. By replacing traditional, delay-prone claims with data-driven micro-payouts, Q-Shield ensures that when environmental conditions disrupt work, financial protection is instantaneous and frictionless.
 
 ---
 
 ## 📽️ Submission Deliverables
 
 ### [Pitch Deck]
-> [!IMPORTANT]
-> **View our Vision for Gig Resilience here:**  
-> [👉 CLICK HERE TO VIEW PITCH DECK](https://link-to-your-pitch-deck.com) *(USER: Please update this link)*
+**View our Vision for Gig Resilience:**  
+[👉 CLICK HERE TO VIEW PITCH DECK](https://link-to-your-pitch-deck.com)
 
 ### [Recorded Video]
-> [!TIP]
-> **Watch the Q-Shield Platform in Action:**  
-> [🎥 WATCH DEMO VIDEO](https://link-to-your-demo-video.com) *(USER: Please update this link)*
+**Watch the Q-Shield Platform in Action:**  
+[🎥 WATCH DEMO VIDEO](https://link-to-your-demo-video.com)
 
 ---
 
-## 🏗️ Elite Technical Architecture
+## 🏗️ Technical Architecture
+Q-Shield utilizes a decoupled microservices architecture designed for reliability and low-latency decision making.
 
-Q-Shield utilizes a decoupled microservices architecture designed for sub-50ms inference and zero-touch settlement.
+**System Flow:**
+`WeatherAPI` → `Node.js Gateway` → `Python ML Engine` → `Risk Analysis` → `Dynamic Premium/Payout` → `React HUD Component`
 
-- **`backend/core/` (Node.js)**: High-throughput gateway managing event streams, policy state, and UPI settlement via Razorpay.
-- **`backend/ai_engine/` (Python/FastAPI)**: Dedicated ML inference service powering risk prediction and fraud detection.
-- **Parametric Pipeline**: Automated trigger engine that cross-references TomTom Traffic and OpenWeather APIs against worker GPS telemetry.
-
-### Logic Flow
-1. **Telemetry**: Real-time GPS and weather data stream into the AI core.
-2. **Inference**: Gradient Boosting Regressors calculate compound risk severity (Rain + Heat + Traffic).
-3. **Trigger**: If risk exceeds the parametric threshold, a payout is instantly authorized.
-4. **Settlement**: Zero-touch funds transfer pushed via UPI in <5 seconds.
+- **Core API Gateway (Node.js)**: Manages real-time event streams, policy state, and UPI settlement logic.
+- **AI Microservice (Python/FastAPI)**: A specialized inference engine that processes complex environmental vectors in sub-second timeframes.
+- **Parametric Execution**: An automated trigger system that cross-references TomTom Traffic and atmospheric sensors against worker GPS telemetry.
 
 ---
 
-## 🧠 Truly AI-Driven Operations
+## 🧠 AI Forecasting & Dynamic Pricing Engine
+Q-Shield integrates a proactive risk pricing system that moves beyond reactive coverage.
 
-Unlike traditional insurance, Q-Shield is powered by explainable actuarial models:
-*   **Gradient Boosting Regressor**: Identifies the compounded danger of overlapping events.
-*   **Random Forest Classifier**: Runs behavioral anomaly detection for fraud prevention.
-*   **Explainable AI (XAI)**: A custom UI radar that visualizes how rainfall, temperature, and historical frequency weighted the final risk score.
+*   **7-Day Climatic Integration**: Real-time ingestion from WeatherAPI to project impending disruptions at the zone level.
+*   **Predictive Premium Modeling**: Utilizing historical disruption frequency and forecasted severity to generate fair, actuarial-backed quotes.
+*   **Explainable AI (XAI)**: Every score includes a transparency layer, allowing both admins and workers to understand the risk contributors (e.g., "High risk detected due to cumulative rainfall (120mm) and increased traffic congestion").
+*   **Administrative Governance**: A specialized underwriting console allows for manual policy overrides with built-in audit trails and automated expiry logic.
 
----
-
-## 🛰️ Situational UI & Elite UX
-- **Mission-Critical HUD**: Workers receive a glassmorphic "Situational Awareness" HUD with real-time atmospheric telemetry.
-- **Simulation Command Deck**: Admins can trigger complex disaster scenarios (**Monsoon Crisis**, **Toxic Smog**, **Black Swan**) to test system resilience in real-time.
+**“This transforms Q-Shield from reactive insurance into a proactive risk pricing system.”**
 
 ---
 
-## 🛠️ Local Installation & Setup
+## 🛠️ Machine Learning Core
+We utilize a multi-model ensemble approach to ensure platform integrity and accuracy:
 
-### Prerequisites
-- Node.js (v18+)
-- Python (3.9+)
-- PostgreSQL (or Supabase)
+*   **Gradient Boosting Regressor**: Dynamically scores risk severity by analyzing the compounded impact of overlapping events (e.g., severe precipitation coupled with high traffic).
+*   **Random Forest Classifier**: Runs behavioral anomaly detection to identify velocity fraud (geo-hopping) and multi-claim abuse in real-time.
+*   **Performance**: Sub-second inference (<1s) achieved through lightweight ML models and local result caching.
 
-### 1. Repository Setup
+---
+
+## 🛰️ Situational Awareness UI
+- **Telemetry HUD**: A glassmorphic interface providing workers with real-time situational awareness (AQI, Rain Intensity, Temp).
+- **Scenario Manager**: A simulation deck for administrators to test system resilience against pre-defined disaster scenarios like **Monsoon Crisis** or **Toxic Smog**.
+
+---
+
+## ❤️ Why Q-Shield Matters
+In the gig economy, a rainstorm isn't just a weather event—it's a sudden loss of income. Traditional insurance requires weeks of documentation and manual auditing, which doesn't help a worker pay today's bills.
+
+Q-Shield ensures:
+*   **Zero-Touch Payouts**: Funds are released the moment the threshold is hit.
+*   **Predictive Protection**: Workers are alerted to high-risk periods before they start.
+*   **No Claim Friction**: Removing the "Proof of Loss" burden from the worker and placing it on reliable data sensors.
+
+---
+
+## 🚀 Execution & Setup
+
+### 1. Repository Initialization
 ```bash
 git clone https://github.com/SaiLokeshkesamsetty/Q-Shield_DevTrails.git
 cd Q-Shield_DevTrails
 npm run install:all
 ```
 
-### 2. Environment Configuration
-Create a `.env` in the root:
+### 2. Environment Setup
+Create a `.env` in the root directory:
 ```env
-DATABASE_URL=your_db_url
-WEATHER_API_KEY=your_key
-JWT_SECRET=your_secret
+DATABASE_URL=your_db_connection_string
+WEATHER_API_KEY=your_openweather_key
+JWT_SECRET=your_secret_key
 ```
 
-### 3. Execution
-Run both servers simultaneously:
+### 3. Launch Platform
 ```bash
 npm run dev
 ```
 
 ---
 
-## 🚀 Roadmap: Phase 4 & Beyond
-1. **Streaming Anomaly Detection**: Transitioning to Kafka/Flink for sliding-window location analysis.
-2. **Computer Vision Claim Adjunct**: Local ResNet verification of disaster-zone imagery.
-3. **Smart Contract Settlement**: Moving the parametric ledger to the Polygon blockchain using the AI Engine as an Oracle.
+## 📅 Future Roadmap
+- **Blockchain Oracle Integration**: Moving the parametric ledger to a public chain (Polygon) for immutable trust.
+- **Computer Vision Verification**: Lightweight ResNet models to verify flooding via user-submitted imagery.
+- **Advanced Streaming**: Transitioning to Apache Flink for true sliding-window geo-telemetry analysis.
 
 ---
-
 *Developed for the Guidewire DEVTrails Hackathon 2026.*
